@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Invitado index{% endblock %}
+
+{% block body %}
+    <h1>Invitado index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>Edad</th>
+                <th>Foto</th>
+                <th>Apodo</th>
+                <th>Rubro</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for invitado in invitados %}
+            <tr>
+                <td>{{ invitado.id }}</td>
+                <td>{{ invitado.nombre }}</td>
+                <td>{{ invitado.apellido }}</td>
+                <td>{{ invitado.edad }}</td>
+                <td>{{ invitado.foto }}</td>
+                <td>{{ invitado.apodo }}</td>
+                <td>{{ invitado.rubro }}</td>
+                <td>
+                    <a href="{{ path('app_invitado_show', {'id': invitado.id}) }}">show</a>
+                    <a href="{{ path('app_invitado_edit', {'id': invitado.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="8">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_invitado_new') }}">Create new</a>
+{% endblock %}

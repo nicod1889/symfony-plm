@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Persona2 index{% endblock %}
+
+{% block body %}
+    <h1>Persona2 index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>Edad</th>
+                <th>Foto</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for persona2 in persona2s %}
+            <tr>
+                <td>{{ persona2.id }}</td>
+                <td>{{ persona2.nombre }}</td>
+                <td>{{ persona2.apellido }}</td>
+                <td>{{ persona2.edad }}</td>
+                <td>{{ persona2.foto }}</td>
+                <td>
+                    <a href="{{ path('app_persona2_show', {'id': persona2.id}) }}">show</a>
+                    <a href="{{ path('app_persona2_edit', {'id': persona2.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="6">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_persona2_new') }}">Create new</a>
+{% endblock %}

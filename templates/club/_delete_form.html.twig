@@ -1,0 +1,7 @@
+<form method="post" action="{{ path('app_club_delete', {'id': club.id}) }}" onsubmit="return confirm('¿Estás seguro que deseas eliminar el club?');">
+    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ club.id) }}">
+    <button class="btn btn-danger pt-1 pb-1">
+        <i class="fa-solid fa-trash"></i>
+        Eliminar
+    </button>
+</form>

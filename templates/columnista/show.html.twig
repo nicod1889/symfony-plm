@@ -1,0 +1,46 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Columnista{% endblock %}
+
+{% block body %}
+    <h1>Columnista</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ columnistum.id }}</td>
+            </tr>
+            <tr>
+                <th>Nombre</th>
+                <td>{{ columnistum.nombre }}</td>
+            </tr>
+            <tr>
+                <th>Apellido</th>
+                <td>{{ columnistum.apellido }}</td>
+            </tr>
+            <tr>
+                <th>Edad</th>
+                <td>{{ columnistum.edad }}</td>
+            </tr>
+            <tr>
+                <th>Foto</th>
+                <td>{{ columnistum.foto }}</td>
+            </tr>
+            <tr>
+                <th>Apodo</th>
+                <td>{{ columnistum.apodo }}</td>
+            </tr>
+            <tr>
+                <th>Columna</th>
+                <td>{{ columnistum.columna }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_columnista_index') }}">back to list</a>
+
+    <a href="{{ path('app_columnista_edit', {'id': columnistum.id}) }}">edit</a>
+
+    {{ include('columnista/_delete_form.html.twig') }}
+{% endblock %}

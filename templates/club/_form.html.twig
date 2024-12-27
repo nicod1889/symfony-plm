@@ -1,0 +1,59 @@
+{{ form_start(form) }}
+    <div class="mb-5">
+        {{ form_widget(form) }}
+        <a href="{{ path('app_club_index') }}" class="btn btn-secondary pt-1 pb-1 mr-2">
+            <i class="fa-solid fa-arrow-left"></i>
+            Back
+        </a>
+        <button class="btn btn-info pt-1 pb-1 mr-2">
+            <i class="fa-solid fa-download"></i>
+            {{ button_label|default('Save') }}
+        </button>
+    </div>
+
+    <div>
+        <h3 class="mb-3 text-center">Personas del club</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Nombre y apellido</th>
+                    <th class="text-center">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for persona in club.personas %}
+                    <tr>
+                        <td><p class="m-0">{{persona.nombre}} {{persona.apellido}}</p></td>
+                        <td class="text-center">
+                            <a href="#" data-toggle="modal" data-target="#persona-modal-{{persona.id}}" >
+                                <i class="fa-solid fa-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+
+                    <div id="persona-modal-{{persona.id}}" class="modal" tabindex="-1">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <p class="modal-title" lang="en">Datos de la persona</p>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Nombre: {{persona.nombre}} {{persona.apellido}}</p>
+                                    <p>DNI: {{persona.dni}}</p>
+                                    <p>Edad: {{persona.edad}}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <tr class="text-center">
+                        <td>No existen registros.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{{ form_end(form) }}

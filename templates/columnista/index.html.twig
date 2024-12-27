@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Columnista index{% endblock %}
+
+{% block body %}
+    <h1>Columnista index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>Edad</th>
+                <th>Foto</th>
+                <th>Apodo</th>
+                <th>Columna</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for columnistum in columnistas %}
+            <tr>
+                <td>{{ columnistum.id }}</td>
+                <td>{{ columnistum.nombre }}</td>
+                <td>{{ columnistum.apellido }}</td>
+                <td>{{ columnistum.edad }}</td>
+                <td>{{ columnistum.foto }}</td>
+                <td>{{ columnistum.apodo }}</td>
+                <td>{{ columnistum.columna }}</td>
+                <td>
+                    <a href="{{ path('app_columnista_show', {'id': columnistum.id}) }}">show</a>
+                    <a href="{{ path('app_columnista_edit', {'id': columnistum.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="8">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_columnista_new') }}">Create new</a>
+{% endblock %}

@@ -21,7 +21,7 @@
             </tr>
             <tr>
                 <th>Link</th>
-                <td>{{ programa.link }}</td>
+                <td>{{ programa.linkYoutube }}</td>
             </tr>
             <tr>
                 <th>Miniatura</th>
@@ -33,6 +33,10 @@
             </tr>
         </tbody>
     </table>
+    <h4>Conductores:</h4>
+    {% for conductor in programa.conductores %}
+        <p class="m-0">{{ conductor.nombre }} {{ conductor.apellido }}</p>
+    {% endfor %}
 
     <a href="{{ path('app_programa_index') }}">back to list</a>
 

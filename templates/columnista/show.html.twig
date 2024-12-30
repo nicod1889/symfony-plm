@@ -35,6 +35,16 @@
                 <th>Columna</th>
                 <td>{{ columnistum.columna }}</td>
             </tr>
+            <tr>
+                <th>Programas</th>
+                <td>
+                    <ul>
+                        {% for programa in columnistum.programas %}
+                            <li>{{ programa.id }}</li>
+                        {% endfor %}
+                    </ul>
+                </td>
+            </tr>
         </tbody>
     </table>
 

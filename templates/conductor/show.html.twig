@@ -47,6 +47,16 @@
                 <th>Youtube</th>
                 <td>{{ conductor.youtube }}</td>
             </tr>
+            <tr>
+                <th>Programas</th>
+                <td>
+                    <ul>
+                        {% for programa in conductor.programas %}
+                            <li>{{ programa.id }}</li>
+                        {% endfor %}
+                    </ul>
+                </td>
+            </tr>
         </tbody>
     </table>
 

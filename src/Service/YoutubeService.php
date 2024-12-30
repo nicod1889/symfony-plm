@@ -7,7 +7,9 @@ use App\Entity\Programa;
 use Doctrine\ORM\EntityManagerInterface;
 
 class YoutubeService {
+
     public string $apiKey;
+    
     private $youtubeApiUrl = 'https://www.googleapis.com/youtube/v3/playlistItems';
 
     public function __construct(HttpClientInterface $httpClient, EntityManagerInterface $entityManager, string $apiKey) {
@@ -44,7 +46,6 @@ class YoutubeService {
                     $programa->setFecha(new \DateTime($snippet['publishedAt']));
                     $programa->setLinkYoutube('https://www.youtube.com/watch?v='.$snippet['resourceId']['videoId']);
                     $programa->setMiniatura($snippet['thumbnails']['medium']['url']);
-                    $programa->setLink
 
                     array_unshift($programas, $programa);
                 }

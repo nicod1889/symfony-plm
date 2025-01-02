@@ -101,11 +101,7 @@
 -->
 [
 {% for programa in paginator.results %}
-    {ENTER
-        "titulo": "{{ programa.titulo }}",ENTER
-        "integrantes": [ ],ENTER
-        "spotify": " "ENTER
-    },ENTER
+<p class="m-0">{{ programa.titulo }}</p>
 {% endfor %}
 ]
 

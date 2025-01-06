@@ -7,9 +7,7 @@ use App\Entity\Post;
 use App\Entity\Programa;
 use App\Entity\Tag;
 use App\Entity\User;
-use App\Entity\Conductor;
-use App\Entity\Columnista;
-use App\Entity\Invitado;
+use App\Entity\Persona3;
 use Psr\Log\LoggerInterface;
 use App\Service\YoutubeService;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -32,55 +30,14 @@ final class AppFixtures extends Fixture {
         $this->loadUsers($manager);
         $this->loadTags($manager);
         $this->loadPosts($manager);
-        $this->loadConductores($manager);
-        $this->loadColumnistas($manager);
         $this->loadProgramas($manager);
-        $this->asociarConductoresConProgramas($manager);
-    }
-
-    public function loadConductores(ObjectManager $manager): void {
-        foreach($this->getConductoresData() as [$nombre, $apellido, $edad, $foto, $cumple, $apodo, $instagram, $twitter, $youtube]) {
-            $conductor = new Conductor();
-            $conductor->setNombre($nombre);
-            $conductor->setApellido($apellido);
-            $conductor->setEdad($edad);
-            $conductor->setFoto($foto);
-            $conductor->setCumple(new \DateTime('2024-12-23'));
-            $conductor->setApodo($apodo);
-            $conductor->setInstagram($instagram);
-            $conductor->setTwitter($twitter);
-            $conductor->setYoutube($youtube);
-
-            $manager->persist($conductor);
-            $this->addReference($nombre, $conductor);
-        }
-        $manager->flush();
-    }
-
-    public function loadColumnistas(ObjectManager $manager): void {
-
-        foreach($this->getColumnistasData() as [$nombre, $apellido, $edad, $foto, $apodo, $columna]) {
-            $columnista = new Columnista();
-            $columnista->setNombre($nombre);
-            $columnista->setApellido($apellido);
-            $columnista->setEdad($edad);
-            $columnista->setFoto($foto);
-            $columnista->setApodo($apodo);
-            $columnista->setColumna($columna);
-
-            $manager->persist($columnista);
-            $this->addReference($apellido, $columnista);
-        }
-
-        $manager->flush();
+        $this->loadPersona3($manager);
     }
 
     private function loadProgramas(ObjectManager $manager): void {
         try {
             $playlistId = 'PLF7Kn3e1aapadYJfWvzACqPG-mqdfOixG';
             $programas = $this->youtubeService->getProgramasFromPlaylist($playlistId);
-
-            $conductores = $manager->getRepository(Conductor::class)->findAll();
 
             foreach ($programas as $programaData) {
                 $programa = new Programa();
@@ -89,10 +46,6 @@ final class AppFixtures extends Fixture {
                 $programa->setLinkYoutube($programaData->getLinkYoutube());
                 $programa->setMiniatura($programaData->getMiniatura());
                 $programa->setEdicion('programa');
-
-                /*foreach ($conductores as $conductor) {
-                    $programa->addConductor($conductor);
-                }*/
 
                 $manager->persist($programa);
             }
@@ -105,55 +58,24 @@ final class AppFixtures extends Fixture {
         }
     }
 
-    public function addConductorToPrograma(Programa $programa, Conductor $conductor, ObjectManager $manager): void {
-        // Verifica si el conductor ya está asociado al programa
-        if (!$programa->getConductores()->contains($conductor)) {
-            $programa->addConductor($conductor); // Método que debes tener en la entidad Programa para agregar conductores
-            $manager->persist($programa);
-            $manager->flush();
-        } else {
-            $this->logger->info("El conductor {$conductor->getNombre()} ya está asociado al programa {$programa->getTitulo()}.");
+    public function loadPersona3(ObjectManager $manager): void {
+        foreach ($this->getPersona3Data() as [$nombre, $edad, $foto, $cumple, $apodo, $instagram, $twitter, $youtube]) {
+            $persona = new Persona3();
+            $persona->setNombre($nombre);
+            $persona->setEdad($edad);
+            $persona->setFoto($foto);
+            $persona->setNacimiento(new \DateTime($cumple));
+            $persona->setApodo($apodo);
+            $persona->setInstagram($instagram);
+            $persona->setTwitter($twitter);
+            $persona->setYoutube($youtube);
+    
+            $manager->persist($persona);
+            $this->addReference($nombre, $persona);
         }
+    
+        $manager->flush();
     }
-
-    public function asociarConductoresConProgramas(ObjectManager $manager): void {
-        // Ruta del archivo JSON
-        $jsonFilePath = 'data/programas_conductores.json';
-    
-        // Leer y decodificar el contenido del archivo JSON
-        $programasConConductores = json_decode(file_get_contents($jsonFilePath), true);
-    
-        // Verificar si el archivo JSON se cargó correctamente
-        if ($programasConConductores === null) {
-            $this->logger->error("No se pudo cargar el archivo JSON de programas y conductores.");
-            return;
-        }
-    
-        // Iterar sobre cada programa y sus conductores
-        foreach ($programasConConductores as $tituloPrograma => $conductorIds) {
-            // Buscar el programa por su título
-            $programa = $manager->getRepository(Programa::class)->findOneBy(['titulo' => $tituloPrograma]);
-            
-            // Verificar si el programa existe
-            if ($programa) {
-                foreach ($conductorIds as $conductorId) {
-                    $conductor = $manager->getRepository(Conductor::class)->find($conductorId);
-                    
-                    // Verificar si el conductor existe
-                    if ($conductor) {
-                        $this->addConductorToPrograma($programa, $conductor, $manager);
-                    } else {
-                        $this->logger->error("Conductor con ID {$conductorId} no encontrado.");
-                    }
-                }
-            } else {
-                $this->logger->error("Programa con título '{$tituloPrograma}' no encontrado.");
-            }
-        }
-    
-        $this->logger->info("Conductores asociados a programas correctamente.");
-    }
-    
 
     private function loadUsers(ObjectManager $manager): void {
         foreach ($this->getUserData() as [$fullname, $username, $password, $email, $roles]) {
@@ -212,6 +134,20 @@ final class AppFixtures extends Fixture {
     }
 
     /**
+     * @return array<array{string, int, string, string, string, string, string, string}>
+     */
+    private function getPersona3Data(): array {
+        return [
+            // $personaData = [$nombre, $edad, $foto, $cumple, $apodo, $instagram, $twitter, $youtube];
+            ['Lucas Rodriguez', 32, 'https://pbs.twimg.com/media/GOtpyuxWoAAkH7R?format=jpg&name=small', '1992-03-21', 'Luqui', 'https://www.instagram.com/luquitarodrigue/', 'https://twitter.com/LuquitaRodrigue', 'https://www.youtube.com/@LuquitasRodriguez'],
+            ['Germán Beder', 41, 'https://pbs.twimg.com/media/GOtrGqDWEAAlXVW?format=jpg&name=small', '1983-05-24', 'Gercho', 'https://www.instagram.com/gbeder/', 'https://twitter.com/gbeder', 'https://www.youtube.com/@GBeder'],
+            ['Alfredo Montes de Oca', 44, 'https://pbs.twimg.com/media/GOtrfjgW4AAIbOT?format=jpg&name=small', '1980-09-17', 'Alfre', 'https://www.instagram.com/alfremontes/', 'https://twitter.com/alfremontes', 'https://www.youtube.com/@Alfremontes'],
+            ['Roberto Galati', 40, 'https://pbs.twimg.com/media/GOtsLQRXYAA-Nym?format=jpg&name=small', '1984-02-20', 'Rober', 'https://www.instagram.com/robergalati/', 'https://twitter.com/robergalati', 'https://www.youtube.com/@robergalati3366'],
+            ['Joaquín Cavanna', 42, 'https://pbs.twimg.com/media/GOw331DWcAAizab?format=jpg&name=small', '1982-04-17', 'Joaco', 'https://www.instagram.com/joacavanna/', 'https://twitter.com/joacavanna', 'https://www.youtube.com/@joacavanna']
+        ];
+    }
+
+    /**
      * @return array<array{string, string, string, string, array<string>}>
      */
     private function getUserData(): array {
@@ -221,33 +157,6 @@ final class AppFixtures extends Fixture {
             ['Tom Doe', 'tom_admin', 'kitten', 'tom_admin@symfony.com', [User::ROLE_ADMIN]],
             ['John Doe', 'john_user', 'kitten', 'john_user@symfony.com', [User::ROLE_USER]],
             ['Nicolas Dinolfo', 'nicod1889xyz', '123', 'nicod1889@symfony.com', [User::ROLE_USER]]
-        ];
-    }
-
-    /**
-     * @return array<array{string, string, integer, string, \DateTime, string, string, string, string}>
-     */
-    private function getConductoresData(): array {
-        // $conductorData = [$nombre, $apellido, $edad, $foto, $cumple, $apodo, $instagram, $twitter, $youtube]
-        return [
-            ['Lucas', 'Rodriguez', 30, 'https://pbs.twimg.com/media/GOtpyuxWoAAkH7R?format=jpg&name=small', '1992-03-21', 'Luquitas', 'https://www.instagram.com/luquitarodrigue/', 'https://twitter.com/LuquitaRodrigue', 'https://www.youtube.com/@LuquitasRodriguez'],
-            ['Germán', 'Beder', 30, 'https://pbs.twimg.com/media/GOtrGqDWEAAlXVW?format=jpg&name=small', '1983-05-24', 'Gercho', 'https://www.instagram.com/gbeder/', 'https://twitter.com/gbeder', 'https://www.youtube.com/@GBeder'],
-            ['Alfredo', 'Montes de Oca', 30, 'https://pbs.twimg.com/media/GOtrfjgW4AAIbOT?format=jpg&name=small', '1980-09-18', 'Alfre', 'https://www.instagram.com/alfremontes/', 'https://twitter.com/alfremontes', 'https://www.youtube.com/@Alfremontes'],
-            ['Roberto', 'Galati', 30, 'https://pbs.twimg.com/media/GOtsLQRXYAA-Nym?format=jpg&name=small', '1980-02-20', 'Rober', 'https://www.instagram.com/robergalati/', 'https://twitter.com/robergalati', 'https://www.youtube.com/@robergalati3366'],
-            ['Joaquin', 'Cavanna', 30, 'https://pbs.twimg.com/media/GOw331DWcAAizab?format=jpg&name=small', '1980-02-20', 'Joaco', 'https://www.instagram.com/joacavanna/', 'https://twitter.com/joacavanna', 'https://www.youtube.com/@joacavanna'],
-        ];
-    }
-
-    /**
-     * @return array<array{string, string, integer, string, string, string}>
-     */
-    private function getColumnistasData(): array {
-        // $columnistaData = [$nombre, $apellido, $edad, $foto, $apodo, $columna]
-        return [
-            ['Joaquin', 'Cavanna', 30, 'https://pbs.twimg.com/media/GOw331DWcAAizab?format=jpg&name=small', 'Joaco', 'Videos de internet'],
-            ['Juan', 'Castro', 30, 'https://pbs.twimg.com/media/Ga3QY1PWEAAbnfN?format=png&name=small', 'Juan', 'Futbol y mundo brasil'],
-            ['Alexis', 'Valido', 30, 'https://pbs.twimg.com/media/GOwyvV3XIAEWoEf?format=jpg&name=small', 'Alexis', 'Musica'],
-            ['Juan', 'Igal', 20, 'https://pbs.twimg.com/media/GOwzhqtWIAMsZ-C?format=jpg&name=small', 'Juan', 'Futbol y mundo internet']
         ];
     }
 

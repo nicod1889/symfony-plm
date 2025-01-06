@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Persona3 index{% endblock %}
+
+{% block body %}
+    <h1>Persona3 index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Nombre</th>
+                <th>Apodo</th>
+                <th>Nacimiento</th>
+                <th>Edad</th>
+                <th>Foto</th>
+                <th>Rubro</th>
+                <th>Instagram</th>
+                <th>Twitter</th>
+                <th>Youtube</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for persona3 in persona3s %}
+            <tr>
+                <td>{{ persona3.id }}</td>
+                <td>{{ persona3.nombre }}</td>
+                <td>{{ persona3.apodo }}</td>
+                <td>{{ persona3.nacimiento ? persona3.nacimiento|date('Y-m-d') : '' }}</td>
+                <td>{{ persona3.edad }}</td>
+                <td>{{ persona3.foto }}</td>
+                <td>{{ persona3.rubro }}</td>
+                <td>{{ persona3.instagram }}</td>
+                <td>{{ persona3.twitter }}</td>
+                <td>{{ persona3.youtube }}</td>
+                <td>
+                    <a href="{{ path('app_persona3_show', {'id': persona3.id}) }}">show</a>
+                    <a href="{{ path('app_persona3_edit', {'id': persona3.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="11">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_persona3_new') }}">Create new</a>
+{% endblock %}

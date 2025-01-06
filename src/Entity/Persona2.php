@@ -23,9 +23,6 @@ class Persona2 {
     #[ORM\Column(length: 50)]
     private ?string $nombre = null;
 
-    #[ORM\Column(length: 50)]
-    private ?string $apellido = null;
-
     #[ORM\Column]
     private ?int $edad = null;
 

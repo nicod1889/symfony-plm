@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Persona3{% endblock %}
+
+{% block body %}
+    <h1>Edit Persona3</h1>
+
+    {{ include('persona3/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('app_persona3_index') }}">back to list</a>
+
+    {{ include('persona3/_delete_form.html.twig') }}
+{% endblock %}

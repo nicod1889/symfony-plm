@@ -8,6 +8,7 @@ use App\Entity\Programa;
 use App\Entity\Tag;
 use App\Entity\User;
 use App\Entity\Persona3;
+use App\Entity\Rol;
 use Psr\Log\LoggerInterface;
 use App\Service\YoutubeService;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -30,15 +31,16 @@ final class AppFixtures extends Fixture {
         $this->loadUsers($manager);
         $this->loadTags($manager);
         $this->loadPosts($manager);
-        $this->loadProgramas($manager);
         $this->loadPersona3($manager);
+        $this->loadProgramas($manager);
+        $this->vincularConductoresYColumnistas($manager);
     }
 
     private function loadProgramas(ObjectManager $manager): void {
         try {
             $playlistId = 'PLF7Kn3e1aapadYJfWvzACqPG-mqdfOixG';
             $programas = $this->youtubeService->getProgramasFromPlaylist($playlistId);
-
+    
             foreach ($programas as $programaData) {
                 $programa = new Programa();
                 $programa->setTitulo($programaData->getTitulo());
@@ -46,26 +48,65 @@ final class AppFixtures extends Fixture {
                 $programa->setLinkYoutube($programaData->getLinkYoutube());
                 $programa->setMiniatura($programaData->getMiniatura());
                 $programa->setEdicion('programa');
-
+    
                 $manager->persist($programa);
             }
-
+    
             $manager->flush();
-
             $this->logger->info('Programas cargados correctamente desde YouTube.');
         } catch (\Exception $e) {
             $this->logger->error('Error al cargar los programas: ' . $e->getMessage());
         }
     }
 
+    private function vincularConductoresYColumnistas(ObjectManager $manager): void {
+        try {
+            $filePath = 'data/programas_conductores.json';   
+            $jsonData = file_get_contents($filePath);
+            $programasData = json_decode($jsonData, true);
+            $personaRepository = $manager->getRepository(Persona3::class);
+    
+            foreach ($programasData as $programaData) {
+                $programa = $manager->getRepository(Programa::class)->findOneBy(['titulo' => $programaData['titulo']]);
+                $this->logger->info('Buscando programa con título: ' . $programaData['titulo']);
+                if (!$programa) {
+                    $this->logger->error('No se encontró el programa con el título: ' . $programaData['titulo']);
+                    continue;
+                }
+
+                $conductores = $personaRepository->findBy(['id' => $programaData['conductores']]);
+                foreach ($conductores as $conductor) {
+                    $programa->addConductor($conductor);
+                }
+
+                $columnistas = $personaRepository->findBy(['id' => $programaData['columnistas']]);
+                foreach ($columnistas as $columnista) {
+                    $programa->addColumnista($columnista);
+                }
+
+                $invitados = $personaRepository->findBy(['id' => $programaData['invitados']]);
+                foreach ($invitados as $invitado) {
+                    $programa->addInvitado($invitado);
+                }
+    
+                $manager->persist($programa);
+            }
+    
+            $manager->flush();   
+        } catch (\Exception $e) {
+            $this->logger->error('Error al vincular conductores y columnistas: ' . $e->getMessage());
+        }
+    }
+
     public function loadPersona3(ObjectManager $manager): void {
-        foreach ($this->getPersona3Data() as [$nombre, $edad, $foto, $cumple, $apodo, $instagram, $twitter, $youtube]) {
+        foreach ($this->getPersona3Data() as [$nombre, $edad, $foto, $nacimiento, $apodo, $rubro, $instagram, $twitter, $youtube]) {
             $persona = new Persona3();
             $persona->setNombre($nombre);
             $persona->setEdad($edad);
             $persona->setFoto($foto);
-            $persona->setNacimiento(new \DateTime($cumple));
+            $persona->setNacimiento(new \DateTime($nacimiento));
             $persona->setApodo($apodo);
+            $persona->setRubro($rubro);
             $persona->setInstagram($instagram);
             $persona->setTwitter($twitter);
             $persona->setYoutube($youtube);
@@ -138,12 +179,261 @@ final class AppFixtures extends Fixture {
      */
     private function getPersona3Data(): array {
         return [
-            // $personaData = [$nombre, $edad, $foto, $cumple, $apodo, $instagram, $twitter, $youtube];
-            ['Lucas Rodriguez', 32, 'https://pbs.twimg.com/media/GOtpyuxWoAAkH7R?format=jpg&name=small', '1992-03-21', 'Luqui', 'https://www.instagram.com/luquitarodrigue/', 'https://twitter.com/LuquitaRodrigue', 'https://www.youtube.com/@LuquitasRodriguez'],
-            ['Germán Beder', 41, 'https://pbs.twimg.com/media/GOtrGqDWEAAlXVW?format=jpg&name=small', '1983-05-24', 'Gercho', 'https://www.instagram.com/gbeder/', 'https://twitter.com/gbeder', 'https://www.youtube.com/@GBeder'],
-            ['Alfredo Montes de Oca', 44, 'https://pbs.twimg.com/media/GOtrfjgW4AAIbOT?format=jpg&name=small', '1980-09-17', 'Alfre', 'https://www.instagram.com/alfremontes/', 'https://twitter.com/alfremontes', 'https://www.youtube.com/@Alfremontes'],
-            ['Roberto Galati', 40, 'https://pbs.twimg.com/media/GOtsLQRXYAA-Nym?format=jpg&name=small', '1984-02-20', 'Rober', 'https://www.instagram.com/robergalati/', 'https://twitter.com/robergalati', 'https://www.youtube.com/@robergalati3366'],
-            ['Joaquín Cavanna', 42, 'https://pbs.twimg.com/media/GOw331DWcAAizab?format=jpg&name=small', '1982-04-17', 'Joaco', 'https://www.instagram.com/joacavanna/', 'https://twitter.com/joacavanna', 'https://www.youtube.com/@joacavanna']
+            // $personaData = [$nombre, $edad, $foto, $nacimiento, $apodo, $rubro, $instagram, $twitter, $youtube];
+            ['Lucas Rodriguez', 32, 'https://pbs.twimg.com/media/GOtpyuxWoAAkH7R?format=jpg&name=small', '21-3-1992', 'Luqui', 'Comediante', 'https://www.instagram.com/luquitarodrigue/', 'https://twitter.com/LuquitaRodrigue', 'https://www.youtube.com/@LuquitasRodriguez'],
+            ['Germán Beder', 41, 'https://pbs.twimg.com/media/GOtrGqDWEAAlXVW?format=jpg&name=small', '24-5-1983', 'Gercho', 'Periodista, Escritor/a', 'https://www.instagram.com/gbeder/', 'https://twitter.com/gbeder', 'https://www.youtube.com/@GBeder'],
+            ['Alfredo Montes de Oca', 44, 'https://pbs.twimg.com/media/GOtrfjgW4AAIbOT?format=jpg&name=small', '17-9-1980', 'Alfre', 'Periodista', 'https://www.instagram.com/alfremontes/', 'https://twitter.com/alfremontes', 'https://www.youtube.com/@Alfremontes'],
+            ['Roberto Galati', 40, 'https://pbs.twimg.com/media/GOtsLQRXYAA-Nym?format=jpg&name=small', '20-2-1984', 'Rober', 'Comediante', 'https://www.instagram.com/robergalati/', 'https://twitter.com/robergalati', 'https://www.youtube.com/@robergalati3366'],
+            ['Joaquín Cavanna', 42, 'https://pbs.twimg.com/media/GOw331DWcAAizab?format=jpg&name=small', '17-4-1982', 'Joaco', 'Periodista', 'https://www.instagram.com/joacavanna/', 'https://twitter.com/joacavanna', 'https://www.youtube.com/@joacavanna'],
+            ['Tomás Rebord', 31, 'https://pbs.twimg.com/media/GOw331DWcAAizab?format=jpg&name=small', '6-7-1993', 'Rebord', 'Abogado/a, Conductor/a', 'NULL', 'NULL', 'NULL'],
+            ['Juan Igal', 25, 'https://pbs.twimg.com/media/GOwzhqtWIAMsZ-C?format=jpg&name=small', '7-7-1999', 'Igal', 'Streamer', 'NULL', 'NULL', 'NULL'],
+            ['Noski', 125, 'NULL', '1-1-1900', 'Noski', 'Twittero/a', 'NULL', 'NULL', 'NULL'],
+            ['Juan Castro', 43, 'https://pbs.twimg.com/media/Ga3QY1PWEAAbnfN?format=png&name=small', '29-1-1981', 'Juancaster', 'Periodista', 'NULL', 'NULL', 'NULL'],
+            ['Alexis Valido', 40, 'https://pbs.twimg.com/media/GOwyvV3XIAEWoEf?format=jpg&name=small', '17-7-1984', 'Alexis', 'Productor/a, Músico/a', 'NULL', 'NULL', 'NULL'],
+            ['Julian Kartun', 41, 'NULL', '7-11-1983', 'NULL', 'Músico, Actor/Actriz', 'NULL', 'NULL', 'NULL'],
+            ['Luis Ventura', 68, 'NULL', '14-1-1956', 'NULL', 'Periodista, DT', 'NULL', 'NULL', 'NULL'],
+            ['Gordo Ventilador', 125, 'NULL', '1-1-1900', 'NULL', 'Animador/a, Influencer', 'NULL', 'NULL', 'NULL'],
+            ['Lucas Pratto', 35, 'NULL', '4-6-1989', 'NULL', 'Futbolista', 'NULL', 'NULL', 'NULL'],
+            ['Fernanda Metilli', 40, 'NULL', '13-6-1984', 'NULL', 'Comediante, Actor/Actriz', 'NULL', 'NULL', 'NULL'],
+            ['Rusherking', 24, 'NULL', '20-5-2000', 'NULL', 'Músico/a', 'NULL', 'NULL', 'NULL'],
+            ['FMK', 25, 'NULL', '27-1-1999', 'NULL', 'Músico/a', 'NULL', 'NULL', 'NULL'],
+            ['El Demente', 30, 'NULL', '19-12-1994', 'NULL', 'Streamer, Influencer', 'NULL', 'NULL', 'NULL'],
+            ['Toto Kirzner', 26, 'NULL', '17-8-1998', 'NULL', 'Actor/Actriz', 'NULL', 'NULL', 'NULL'],
+            ['Juan Pablo Varsky', 54, 'NULL', '27-10-1970', 'NULL', 'Periodista', 'NULL', 'NULL', 'NULL'],
+            ['Goncho Banzas', 29, 'NULL', '14-9-1995', 'NULL', 'Streamer', 'NULL', 'NULL', 'NULL'],
+            ['Lit Killah', 25, 'NULL', '4-10-1999', 'NULL', 'Músico/a', 'NULL', 'NULL', 'NULL'],
+            ['Fran Gomez', 31, 'NULL', '2-11-1993', 'NULL', 'Comediante, Influencer', 'NULL', 'NULL', 'NULL'],
+            ['Alexandra Kohan', 53, 'NULL', '29-1-1971', 'NULL', 'Psicoanalista, Docente', 'NULL', 'NULL', 'NULL'],
+            ['Dillom', 24, 'NULL', '5-12-2000', 'NULL', 'Músico/a', 'NULL', 'NULL', 'NULL'],
+            ['Muzzu', 125, 'NULL', '1-1-1900', 'NULL', 'Periodista', 'NULL', 'NULL', 'NULL'],
+            ['Duki', 28, 'NULL', '24-6-1996', 'NULL', 'Músico/a', 'NULL', 'NULL', 'NULL'],
+            ['Federico D Elía', 58, 'NULL', '4-10-1966', 'NULL', 'Actor/Actriz', 'NULL', 'NULL', 'NULL'],
+            ['Manu Olivari', 39, 'NULL', '1-4-1985', 'NULL', 'Periodista', 'NULL', 'NULL', 'NULL'],
+            ['Danny Ocean', 32, 'NULL', '5-5-1992', 'NULL', 'Músico/a', 'NULL', 'NULL', 'NULL'],
+            ['Palito', 125, 'NULL', '1-1-1900', 'NULL', 'Twittero/a', 'NULL', 'NULL', 'NULL'],
+            ['Juan Marconi', 37, 'NULL', '17-10-1987', 'NULL', 'Periodista, Conductor', 'NULL', 'NULL', 'NULL'],
+            ['Oveja Hernandez', 61, 'NULL', '1-11-1963', 'NULL', 'Exbasquetbolista, Director Técnico (Futbol)', 'NULL', 'NULL', 'NULL'],
+            ['Matías Martin', 54, 'NULL', '27-10-1970', 'NULL', 'Periodista', 'NULL', 'NULL', 'NULL'],
+            ['Nicolás Laprovíttola', 34, 'NULL', '31-1-1990', 'NULL', 'Basquetbolista', 'NULL', 'NULL', 'NULL'],
+            ['Ariel Senosiain', 45, 'NULL', '3-7-1979', 'NULL', 'Periodista', 'NULL', 'NULL', 'NULL'],
+            ['José Montesano', 53, 'NULL', '23-1-1971', 'NULL', 'Periodista', 'NULL', 'NULL', 'NULL'],
+            ['Saramalacara', 24, 'NULL', '8-11-2000', 'NULL', 'Músico/a', 'NULL', 'NULL', 'NULL'],
+            ['Grego Rossello', 33, 'NULL', '13-8-1991', 'NULL', 'Comediante, Influencer', 'NULL', 'NULL', 'NULL'],
+            ['Unicornio', 25, 'NULL', '7-6-1999', 'NULL', 'Streamer', 'NULL', 'NULL', 'NULL'],
+            ['Topa', 49, 'NULL', '11-10-1975', 'NULL', 'Actor/Actriz, Animador, Musico/a', 'NULL', 'NULL', 'NULL'],
+            ['BB Asul', 27, 'NULL', '26-6-1997', 'NULL', 'Músico/a', 'NULL', 'NULL', 'NULL'],
+            ['Migue Granados', 38, 'NULL', '2-9-1986', 'NULL', 'Comediante, Conductor', 'NULL', 'NULL', 'NULL'],
+            ['Mono de Kapanga', 55, 'NULL', '12-4-1969', 'NULL', 'Músico/a', 'NULL', 'NULL', 'NULL'],
+            ['Agustín Bernasconi (MYA)', 28, 'NULL', '15-10-1996', 'NULL', 'Músico/a', 'NULL', 'NULL', 'NULL'],
+            ['Máximo Espíndola (MYA)', 30, 'NULL', '3-12-1994', 'NULL', 'Músico/a', 'NULL', 'NULL', 'NULL'],
+            ['Nico Villalba', 25, 'NULL', '23-10-1999', 'NULL', 'Jugador de Esports (FIFA)', 'NULL', 'NULL', 'NULL'],
+            ['Facu Campazzo', 33, 'NULL', '23-3-1991', 'NULL', 'Basquetbolista', 'NULL', 'NULL', 'NULL'],
+            ['Louta', 30, 'NULL', '22-6-1994', 'NULL', 'Músico/a', 'NULL', 'NULL', 'NULL'],
+            ['Patricio Garino', 31, 'NULL', '17-5-1993', 'NULL', 'Basquetbolista', 'NULL', 'NULL', 'NULL'],
+            ['Davo Xeneize', 22, 'NULL', '4-12-2002', 'NULL', 'Streamer', 'NULL', 'NULL', 'NULL'],
+            ['Gaspar Benegas', 46, 'NULL', '7-1-1978', 'NULL', 'Músico/a', 'NULL', 'NULL', 'NULL'],
+            ['Alejandro Fantino', 53, 'NULL', '26-9-1971', 'NULL', 'Periodista', 'NULL', 'NULL', 'NULL'],
+            ['Gonzalo Heredia', 42, 'NULL', '12-3-1982', 'NULL', 'Actor/Actriz', 'NULL', 'NULL', 'NULL'],
+            ['Seba Varela del Rio', 37, 'NULL', '11-6-1987', 'NULL', 'Periodista', 'NULL', 'NULL', 'NULL'],
+            ['Javi Lanza', 125, 'NULL', '1-1-1900', 'NULL', 'Periodista Deportivo', 'NULL', 'NULL', 'NULL'],
+            ['Ima Rodriguez', 28, 'NULL', '5-3-1996', 'NULL', 'Actor/Actriz', 'NULL', 'NULL', 'NULL'],
+            ['Diego Latorre', 55, 'NULL', '4-8-1969', 'NULL', 'Exfutbolista, Periodista', 'NULL', 'NULL', 'NULL'],
+            ['Valentin Torres Erwerle', 20, 'NULL', '8-12-2004', 'NULL', 'Periodista', 'NULL', 'NULL', 'NULL'],
+            ['Hilda Lizarazu', 61, 'NULL', '12-10-1963', 'NULL', 'Músico/a', 'NULL', 'NULL', 'NULL'],
+            ['Violeta Urtizberea', 39, 'NULL', '19-2-1985', 'NULL', 'Actor/Actriz', 'NULL', 'NULL', 'NULL'],
+            ['Elio Rossi', 61, 'NULL', '4-5-1963', 'NULL', 'Periodista', 'NULL', 'NULL', 'NULL'],
+            ['Florian', 29, 'NULL', '11-5-1995', 'NULL', 'Músico/a', 'NULL', 'NULL', 'NULL'],
+            ['Carlos Maslaton', 66, 'NULL', '19-12-1958', 'NULL', 'Abogado, Analista Financiero', 'NULL', 'NULL', 'NULL'],
+            ['Lucas Lauriente', 32, 'NULL', ' 24-1-1992', 'NULL', 'Comediante', 'NULL', 'NULL', 'NULL'],
+            ['Sergio Goycochea', 61, 'NULL', '17-10-1963', 'NULL', 'Exfutbolista', 'NULL', 'NULL', 'NULL'],
+            ['Zambayonny', 51, 'NULL', '8-9-1973', 'NULL', 'Músico/a', 'NULL', 'NULL', 'NULL'],
+            ['Piti Fernandez', 42, 'NULL', '14-11-1982', 'NULL', 'Músico/a', 'NULL', 'NULL', 'NULL'],
+            ['Hector Baldassi', 59, 'NULL', '5-1-1966', 'NULL', 'Ex-árbitro', 'NULL', 'NULL', 'NULL'],
+            ['Diego Ripoll', 50, 'NULL', '13-1-1974', 'NULL', 'Locutor', 'NULL', 'NULL', 'NULL'],
+            ['Benja Amadeo', 40, 'NULL', '22-4-1984', 'NULL', 'Actor/Actriz, Músico/a', 'NULL', 'NULL', 'NULL'],
+            ['Clemente Cancela', 47, 'NULL', '10-10-1977', 'NULL', 'Periodista', 'NULL', 'NULL', 'NULL'],
+            ['Luis Rubio', 59, 'NULL', '19-11-1965', 'NULL', 'Comediante, Actor/Actriz', 'NULL', 'NULL', 'NULL'],
+            ['Juariu', 38, 'NULL', '11-1-1986', 'NULL', 'Influencer', 'NULL', 'NULL', 'NULL'],
+            ['Peto Menahem', 54, 'NULL', '28-2-1970', 'NULL', 'Actor/Actriz, Comediante', 'NULL', 'NULL', 'NULL'],
+            ['Sergio Rondina', 53, 'NULL', '3-11-1971', 'NULL', 'Exfutbolista, Director Técnico (Futbol)', 'NULL', 'NULL', 'NULL'],
+            ['Hernán Casciari', 53, 'NULL', '16-3-1971', 'NULL', 'Escritor/a', 'NULL', 'NULL', 'NULL'],
+            ['Gastón Sardelli (Airbag)', 40, 'NULL', '18-4-1984', 'NULL', 'Músico/a', 'NULL', 'NULL', 'NULL'],
+            ['Patricio Sardelli (Airbag)', 38, 'NULL', '26-1-1986', 'NULL', 'Músico/a', 'NULL', 'NULL', 'NULL'],
+            ['Guido Sardelli (Airbag)', 36, 'NULL', '5-12-1988', 'NULL', 'Músico/a', 'NULL', 'NULL', 'NULL'],
+            ['Chino Leunis', 44, 'NULL', '9-9-1980', 'NULL', 'Conductor/a', 'NULL', 'NULL', 'NULL'],
+            ['Emmanuel Horvilleur', 50, 'NULL', '2-1-1975', 'NULL', 'Músico/a', 'NULL', 'NULL', 'NULL'],
+            ['Ricky Blanco', 125, 'NULL', '1-1-1900', 'NULL', 'Personalidad de internet', 'NULL', 'NULL', 'NULL'],
+            ['Sebastian De Caro', 49, 'NULL', '15-12-1975', 'NULL', 'Director/a de Cine', 'NULL', 'NULL', 'NULL'],
+            ['Delfina Pignatiello', 24, 'NULL', '19-4-2000', 'NULL', 'Exnadador/a', 'NULL', 'NULL', 'NULL'],
+            ['Natalia Carulias', 49, 'NULL', '19-10-1975', 'NULL', 'Comediante', 'NULL', 'NULL', 'NULL'],
+            ['Leo Gabes', 125, 'NULL', '1-1-1900', 'NULL', 'Periodista Deportivo', 'NULL', 'NULL', 'NULL'],
+            ['Adrian Lacroix', 125, 'NULL', '1-1-1900', 'NULL', 'Mago', 'NULL', 'NULL', 'NULL'],
+            ['CAE', 55, 'NULL', '20-10-1969', 'NULL', 'Músico/a', 'NULL', 'NULL', 'NULL'],
+            ['Paulina Cocina', 48, 'NULL', '22-7-1976', 'NULL', 'Cocinera, Influencer', 'NULL', 'NULL', 'NULL'],
+            ['José María Listorti', 51, 'NULL', '4-3-1973', 'NULL', 'Comediante, Conductor/a', 'NULL', 'NULL', 'NULL'],
+            ['Juan Carlos Baglietto', 69, 'NULL', '14-6-1955', 'NULL', 'Músico/a', 'NULL', 'NULL', 'NULL'],
+            ['El Bananero', 48, 'NULL', '12-9-1976', 'NULL', 'Comediante, Influencer', 'NULL', 'NULL', 'NULL'],
+            ['Sergio Massa', 52, 'NULL', '28-4-1972', 'NULL', 'Político/a', 'NULL', 'NULL', 'NULL'],
+            ['Roberto Moldavsky', 62, 'NULL', '12-9-1962', 'NULL', 'Comediante, Escritor/a', 'NULL', 'NULL', 'NULL'],
+            ['Mariano Llinas', 49, 'NULL', '10-2-1975', 'NULL', 'Director/a de Cine', 'NULL', 'NULL', 'NULL'],
+            ['Pablo Giralt', 50, 'NULL', '5-4-1974', 'NULL', 'Periodista Deportivo', 'NULL', 'NULL', 'NULL'],
+            ['Momo', 125, 'NULL', '1-1-1900', 'NULL', 'Streamer', 'NULL', 'NULL', 'NULL'],
+            ['Felipe Pigna', 65, 'NULL', '29-5-1959', 'NULL', 'Historiador/a', 'NULL', 'NULL', 'NULL'],
+            ['Gaston Edul', 30, 'NULL', '31-12-1994', 'NULL', 'Periodista Deportivo', 'NULL', 'NULL', 'NULL'],
+            ['José Chatruc', 48, 'NULL', '9-11-1976', 'NULL', 'Exfutbolista', 'NULL', 'NULL', 'NULL'],
+            ['Martín Garabal', 41, 'NULL', '7-11-1983', 'NULL', 'Comediante, Actor/Actriz', 'NULL', 'NULL', 'NULL'],
+            ['Ruben Dario Insua', 63, 'NULL', '17-4-1961', 'NULL', 'Exfutbolista, Director Técnico (Futbol)', 'NULL', 'NULL', 'NULL'],
+            ['Luken', 27, 'NULL', '25-3-1997', 'NULL', 'Jugador de Esports (Counter), Streamer', 'NULL', 'NULL', 'NULL'],
+            ['Lucas Zelarayán', 125, 'NULL', '1-1-1900', 'NULL', 'Futbolista', 'NULL', 'NULL', 'NULL'],
+            ['Renzo Saravia', 125, 'NULL', '1-1-1900', 'NULL', 'Futbolista', 'NULL', 'NULL', 'NULL'],
+            ['Wanchope Ábila', 125, 'NULL', '1-1-1900', 'NULL', 'Futbolista', 'NULL', 'NULL', 'NULL'],
+            ['Pali Bilbao', 125, 'NULL', '1-1-1900', 'NULL', 'Productor', 'NULL', 'NULL', 'NULL'],
+            ['Messismo', 125, 'NULL', '1-1-1900', 'NULL', 'Influencer', 'NULL', 'NULL', 'NULL'],
+            ['Yolo', 125, 'NULL', '1-1-1900', 'NULL', 'Youtuber', 'NULL', 'NULL', 'NULL'],
+            ['Nando', 125, 'NULL', '1-1-1900', 'NULL', 'Youtuber', 'NULL', 'NULL', 'NULL'],
+            ['Sebastián Fernández', 125, 'NULL', '1-1-1900', 'NULL', 'Streamer', 'NULL', 'NULL', 'NULL'],
+            ['Big Ari', 125, 'NULL', '1-1-1900', 'NULL', 'Exparticipante GH', 'NULL', 'NULL', 'NULL'],
+            ['Gaston Pauls', 125, 'NULL', '1-1-1900', 'NULL', 'Actor/Actriz', 'NULL', 'NULL', 'NULL'],
+            ['Daniel Hendler', 125, 'NULL', '1-1-1900', 'NULL', 'Actor/Actriz, Director/a', 'NULL', 'NULL', 'NULL'],
+            ['Chapu Nocioni', 45, 'NULL', '30-11-1979', 'NULL', 'Exbasquetbolista', 'NULL', 'NULL', 'NULL'],
+            ['Franco Pisso', 30, 'NULL', '13-2-1994', 'NULL', 'Youtuber', 'NULL', 'NULL', 'NULL'],
+            ['Juanita Groisman', 28, 'NULL', '6-8-1996', 'NULL', 'Twittero/a', 'NULL', 'NULL', 'NULL'],
+            ['La Cobra', 26, 'NULL', '8-9-1998', 'NULL', 'Streamer', 'NULL', 'NULL', 'NULL'],
+            ['Mariano Martinez', 46, 'NULL', '5-12-1978', 'NULL', 'Actor/Actriz', 'NULL', 'NULL', 'NULL'],
+            ['Nachoide', 24, 'NULL', '24-5-2000', 'NULL', 'Twittero/a', 'NULL', 'NULL', 'NULL'],
+            ['Sofi Martinez', 31, 'NULL', '7-5-1993', 'NULL', 'Periodista Deportivo', 'NULL', 'NULL', 'NULL'],
+            ['Los Caballeros de la Quema', 125, 'NULL', '1-1-1900', 'NULL', 'Grupo Musical', 'NULL', 'NULL', 'NULL'],
+            ['Nati Jota', 30, 'NULL', '26-5-1994', 'NULL', 'Influencer, Periodista', 'NULL', 'NULL', 'NULL'],
+            ['Turco García', 61, 'NULL', '24-8-1963', 'NULL', 'Exfutbolista', 'NULL', 'NULL', 'NULL'],
+            ['Caro Vazquez', 31, 'NULL', '29-4-1993', 'NULL', 'Jugadora Esports (FIFA)', 'NULL', 'NULL', 'NULL'],
+            ['Mati Pellicioni', 38, 'NULL', '13-5-1986', 'NULL', 'Periodista', 'NULL', 'NULL', 'NULL'],
+            ['Mario Pergolini', 60, 'NULL', '3-7-1964', 'NULL', 'Presentador/a, Empresario/a', 'NULL', 'NULL', 'NULL'],
+            ['Santi Korovsky', 39, 'NULL', '26-2-1985', 'NULL', 'Actor/Actriz', 'NULL', 'NULL', 'NULL'],
+            ['Augusto Batalla', 28, 'NULL', '30-4-1996', 'NULL', 'Futbolista', 'NULL', 'NULL', 'NULL'],
+            ['Kapanga', 125, 'NULL', '1-1-1900', 'NULL', 'Grupo Musical', 'NULL', 'NULL', 'NULL'],
+            ['Juanse', 62, 'NULL', '3-6-1962', 'NULL', 'Músico/a', 'NULL', 'NULL', 'NULL'],
+            ['Santi Motorizado', 44, 'NULL', '19-5-1980', 'NULL', 'Músico/a', 'NULL', 'NULL', 'NULL'],
+            ['Trinche', 27, 'NULL', '24-12-1997', 'NULL', 'Comediante', 'NULL', 'NULL', 'NULL'],
+            ['Fernando Signorini', 74, 'NULL', '7-12-1950', 'NULL', 'Preparador Físico', 'NULL', 'NULL', 'NULL'],
+            ['BM', 25, 'NULL', '27-8-1999', 'NULL', 'Músico/a', 'NULL', 'NULL', 'NULL'],
+            ['Laureano Staropoli', 31, 'NULL', '27-2-1993', 'NULL', 'Luchador MMA', 'NULL', 'NULL', 'NULL'],
+            ['Mariano Peluffo', 53, 'NULL', '1-4-1971', 'NULL', 'Conductor/a', 'NULL', 'NULL', 'NULL'],
+            ['Nancy Dupláa', 55, 'NULL', '3-12-1969', 'NULL', 'Actor/Actriz', 'NULL', 'NULL', 'NULL'],
+            ['Rodolfo De Paoli', 46, 'NULL', '26-10-1978', 'NULL', 'Relator, Director Técnico', 'NULL', 'NULL', 'NULL'],
+            ['Maru Botana', 56, 'NULL', '17-8-1968', 'NULL', 'Cocinero/a', 'NULL', 'NULL', 'NULL'],
+            ['Bizarrap', 26, 'NULL', '29-8-1998', 'NULL', 'Productor Musical', 'NULL', 'NULL', 'NULL'],
+            ['Jorgito Porcel Jr', 125, 'NULL', '1-1-1900', 'NULL', 'Personalidad de internet', 'NULL', 'NULL', 'NULL'],
+            ['Gabriel Schultz', 58, 'NULL', '21-7-1966', 'NULL', 'Periodista', 'NULL', 'NULL', 'NULL'],
+            ['Acru', 27, 'NULL', '4-6-1997', 'NULL', 'Músico/a', 'NULL', 'NULL', 'NULL'],
+            ['Julio Leiva', 46, 'NULL', '3-4-1978', 'NULL', 'Periodista', 'NULL', 'NULL', 'NULL'],
+            ['Esteban Lamothe', 47, 'NULL', '30-4-1977', 'NULL', 'Actor/Actriz', 'NULL', 'NULL', 'NULL'],
+            ['Coscu', 33, 'NULL', '3-8-1991', 'NULL', 'Streamer', 'NULL', 'NULL', 'NULL'],
+            ['Juanchi Baleiron', 59, 'NULL', '11-3-1965', 'NULL', 'Músico/a', 'NULL', 'NULL', 'NULL'],
+            ['Natalie Perez', 38, 'NULL', '4-11-1986', 'NULL', 'Actor/Actriz', 'NULL', 'NULL', 'NULL'],
+            ['Maravilla Martinez', 49, 'NULL', '21-2-1975', 'NULL', 'Exboxeador', 'NULL', 'NULL', 'NULL'],
+            ['Laucha (Locos x el Asado)', 125, 'NULL', '1-1-1900', 'NULL', 'Cocinero', 'NULL', 'NULL', 'NULL'],
+            ['Luis Scola', 44, 'NULL', '30-4-1980', 'NULL', 'Exbasquetbolista', 'NULL', 'NULL', 'NULL'],
+            ['Pimpeano', 26, 'NULL', '5-2-1998', 'NULL', 'Streamer', 'NULL', 'NULL', 'NULL'],
+            ['Joaco Lopez', 27, 'NULL', '23-7-1997', 'NULL', 'Streamer', 'NULL', 'NULL', 'NULL'],
+            ['Charo Lopez', 44, 'NULL', '6-5-1980', 'NULL', 'Actor/Actriz', 'NULL', 'NULL', 'NULL'],
+            ['Frankkaster', 27, 'NULL', '17-4-1997', 'NULL', 'Streamer', 'NULL', 'NULL', 'NULL'],
+            ['Esteban Edul', 40, 'NULL', '10-11-1984', 'NULL', 'Periodista Deportivo', 'NULL', 'NULL', 'NULL'],
+            ['Flavio Azzaro', 39, 'NULL', '12-11-1985', 'NULL', 'Periodista Deportivo', 'NULL', 'NULL', 'NULL'],
+            ['Duka', 63, 'NULL', '27-1-1961', 'NULL', 'Dirigente Deportivo', 'NULL', 'NULL', 'NULL'],
+            ['Soy Rada', 41, 'NULL', '15-9-1983', 'NULL', 'Mago, Comediante', 'NULL', 'NULL', 'NULL'],
+            ['Oberto', 49, 'NULL', '21-3-1975', 'NULL', 'Exbasquetbolista', 'NULL', 'NULL', 'NULL'],
+            ['Sebastián Wainraich', 50, 'NULL', '23-5-1974', 'NULL', 'Periodista', 'NULL', 'NULL', 'NULL'],
+            ['Mariano Zabaleta', 46, 'NULL', '28-2-1978', 'NULL', 'Extenista', 'NULL', 'NULL', 'NULL'],
+            ['Juli Savioli', 22, 'NULL', '24-1-2002', 'NULL', 'Influencer', 'NULL', 'NULL', 'NULL'],
+            ['Facundo Sava', 50, 'NULL', '7-3-1974', 'NULL', 'Exfutbolista, Director Técnico (Fútbol)', 'NULL', 'NULL', 'NULL'],
+            ['Benito SDR', 26, 'NULL', '17-10-1998', 'NULL', 'Streamer', 'NULL', 'NULL', 'NULL'],
+            ['Miguel Simón', 59, 'NULL', '23-7-1965', 'NULL', 'Periodista Deportivo', 'NULL', 'NULL', 'NULL'],
+            ['Emiliano Brancciari', 47, 'NULL', '28-10-1977', 'NULL', 'Músico/a', 'NULL', 'NULL', 'NULL'],
+            ['Franco Colapinto', 21, 'NULL', '27-5-2003', 'NULL', 'Piloto de F1', 'NULL', 'NULL', 'NULL'],
+            ['Chanchi Estevez', 47, 'NULL', '2-6-1977', 'NULL', 'Exfutbolista', 'NULL', 'NULL', 'NULL'],
+            ['Seleneitor', 26, 'NULL', '13-12-1998', 'NULL', 'Influencer', 'NULL', 'NULL', 'NULL'],
+            ['Manuel Burak', 125, 'NULL', '1-1-1900', 'NULL', 'Productor/a', 'NULL', 'NULL', 'NULL'],
+            ['Iván Schargrodsky', 35, 'NULL', '17-3-1989', 'NULL', 'Periodista', 'NULL', 'NULL', 'NULL'],
+            ['Mauro Albarracin', 27, 'NULL', '31-5-1997', 'NULL', 'Youtuber', 'NULL', 'NULL', 'NULL'],
+            ['YSY A', 26, 'NULL', '12-7-1998', 'NULL', 'Músico/a', 'NULL', 'NULL', 'NULL'],
+            ['Alfredo Casero', 62, 'NULL', '12-11-1962', 'NULL', 'Actor/Actriz, Comediante', 'NULL', 'NULL', 'NULL'],
+            ['Martin Kohan', 125, 'NULL', '1-1-1900', 'NULL', 'Escritor/a', 'NULL', 'NULL', 'NULL'],
+            ['Cristian Castro', 50, 'NULL', '8-12-1974', 'NULL', 'Músico/a', 'NULL', 'NULL', 'NULL'],
+            ['Nicki Nicole', 24, 'NULL', '25-8-2000', 'NULL', 'Músico/a', 'NULL', 'NULL', 'NULL'],
+            ['Sebastian Porrini', 125, 'NULL', '1-1-1900', 'NULL', 'Docente, Escritor/a', 'NULL', 'NULL', 'NULL'],
+            ['Axel', 48, 'NULL', '1-1-1977', 'NULL', 'Músico/a', 'NULL', 'NULL', 'NULL'],
+            ['Campi', 55, 'NULL', '10-2-1969', 'NULL', 'Comediante', 'NULL', 'NULL', 'NULL'],
+            ['Donato de Santis', 60, 'NULL', '5-3-1964', 'NULL', 'Cocinero/a', 'NULL', 'NULL', 'NULL'],
+            ['Karina', 38, 'NULL', '30-1-1986', 'NULL', 'Músico/a', 'NULL', 'NULL', 'NULL'],
+            ['Emiliano Coroniti', 41, 'NULL', '15-2-1983', 'NULL', 'Empresario/a, Conductor/a', 'NULL', 'NULL', 'NULL'],
+            ['Ariel Cristofalo', 125, 'NULL', '1-1-1900', 'NULL', 'Perdiosita Deportivo', 'NULL', 'NULL', 'NULL'],
+            ['Julio Lamas', 60, 'NULL', '9-6-1964', 'NULL', 'Director técnico de basquet', 'NULL', 'NULL', 'NULL'],
+            ['Tuli Acosta', 23, 'NULL', '20-6-2001', 'NULL', 'Influencer, Bailarin/a, Cantante', 'NULL', 'NULL', 'NULL'],
+            ['Chapu Martinez', 30, 'NULL', '3-5-1994', 'NULL', 'Influencer', 'NULL', 'NULL', 'NULL'],
+            ['C0ker', 27, 'NULL', '10-7-1997', 'NULL', 'Streamer', 'NULL', 'NULL', 'NULL'],
+            ['Khea', 24, 'NULL', '13-4-2000', 'NULL', 'Músico/a', 'NULL', 'NULL', 'NULL'],
+            ['Asan', 24, 'NULL', '10-3-2000', 'NULL', 'Músico/a', 'NULL', 'NULL', 'NULL'],
+            ['Juan Minujin', 49, 'NULL', '20-5-1975', 'NULL', 'Actor/Actriz', 'NULL', 'NULL', 'NULL'],
+            ['Gastón Recondo', 51, 'NULL', '4-5-1973', 'NULL', 'Periodista Deportivo', 'NULL', 'NULL', 'NULL'],
+            ['Puma Goity', 64, 'NULL', '23-10-1960', 'NULL', 'Actor/Actriz', 'NULL', 'NULL', 'NULL'],
+            ['Marcelo Toscano', 125, 'NULL', '1-1-1900', 'NULL', 'Abogado/a, DJ', 'NULL', 'NULL', 'NULL'],
+            ['Araceli Gonzalez', 57, 'NULL', '19-6-1967', 'NULL', 'Actor/Actriz', 'NULL', 'NULL', 'NULL'],
+            ['Martín Cirio', 40, 'NULL', '13-6-1984', 'NULL', 'Youtuber', 'NULL', 'NULL', 'NULL'],
+            ['Wos', 26, 'NULL', '23-1-1998', 'NULL', 'Músico/a', 'NULL', 'NULL', 'NULL'],
+            ['Cumbio', 33, 'NULL', '6-5-1991', 'NULL', 'Flogger', 'NULL', 'NULL', 'NULL'],
+            ['Lalo Maradona', 58, 'NULL', '29-11-1966', 'NULL', 'Exfutbolista, Director Técnico (Fútbol)', 'NULL', 'NULL', 'NULL'],
+            ['Mateo Sujatovich', 33, 'NULL', '18-1-1991', 'NULL', 'Músico/a', 'NULL', 'NULL', 'NULL'],
+            ['Duende Pablo', 38, 'NULL', '16-12-1986', 'NULL', 'Streamer', 'NULL', 'NULL', 'NULL'],
+            ['Tobías Medrano (La T y la M)', 125, 'NULL', '1-1-1900', 'NULL', 'Músico/a', 'NULL', 'NULL', 'NULL'],
+            ['Matías Rapen (La T y la M)', 125, 'NULL', '1-1-1900', 'NULL', 'Músico/a', 'NULL', 'NULL', 'NULL'],
+            ['De La Ghetto', 40, 'NULL', '17-9-1984', 'NULL', 'Músico/a', 'NULL', 'NULL', 'NULL'],
+            ['Ca7riel', 31, 'NULL', '5-12-1993', 'NULL', 'Músico/a', 'NULL', 'NULL', 'NULL'],
+            ['Paco Amoroso', 31, 'NULL', '17-8-1993', 'NULL', 'Músico/a', 'NULL', 'NULL', 'NULL'],
+            ['Marcos Giles', 125, 'NULL', '1-1-1900', 'NULL', 'Comediante', 'NULL', 'NULL', 'NULL'],
+            ['Zaina', 21, 'NULL', '4-9-2003', 'NULL', 'Freestyler', 'NULL', 'NULL', 'NULL'],
+            ['Morena Beltrán', 25, 'NULL', '29-1-1999', 'NULL', 'Periodista Deportiva', 'NULL', 'NULL', 'NULL'],
+            ['Yeti Bruta Cocina', 38, 'NULL', '11-2-1986', 'NULL', 'Cocinero/a', 'NULL', 'NULL', 'NULL'],
+            ['Mariano Pavone', 42, 'NULL', '27-5-1982', 'NULL', 'Exfutbolista', 'NULL', 'NULL', 'NULL'],
+            ['Guillermo Lopez', 125, 'NULL', '1-1-1900', 'NULL', 'Conductor/a', 'NULL', 'NULL', 'NULL'],
+            ['Ibai Llanos', 29, 'NULL', '26-3-1995', 'NULL', 'Streamer', 'NULL', 'NULL', 'NULL'],
+            ['Nachito Saralegui', 32, 'NULL', '1-4-1992', 'NULL', 'Comediante', 'NULL', 'NULL', 'NULL'],
+            ['Maligno Torres', 29, 'NULL', '28-3-1995', 'NULL', 'Ciclista', 'NULL', 'NULL', 'NULL'],
+            ['Marcelo Benedetto', 58, 'NULL', '6-8-1966', 'NULL', 'Periodista Deportivo', 'NULL', 'NULL', 'NULL'],
+            ['Cofla24cm', 125, 'NULL', '1-1-1900', 'NULL', 'Actor Porno', 'NULL', 'NULL', 'NULL'],
+            ['Spreen', 24, 'NULL', '11-10-2000', 'NULL', 'Streamer', 'NULL', 'NULL', 'NULL'],
+            ['Lucas Blondel', 28, 'NULL', '14-9-1996', 'NULL', 'Futbolista', 'NULL', 'NULL', 'NULL'],
+            ['El Zar de las Finanzas', 37, 'NULL', '26-5-1987', 'NULL', 'Economista', 'NULL', 'NULL', 'NULL'],
+            ['Emilio Moreira (Tiempo de Videojuegos)', 45, 'NULL', '15-10-1979', 'NULL', 'Comediante', 'NULL', 'NULL', 'NULL'],
+            ['Juan Ruffo', 125, 'NULL', '1-1-1900', 'NULL', 'Productor/a, Conductor/a', 'NULL', 'NULL', 'NULL'],
+            ['Tomas Mazza', 24, 'NULL', '16-4-2000', 'NULL', 'Streamer', 'NULL', 'NULL', 'NULL'],
+            ['Gustavo Fernández', 30, 'NULL', '21-1-1994', 'NULL', 'Tenista', 'NULL', 'NULL', 'NULL'],
+            ['Pablo Granados', 59, 'NULL', '11-9-1965', 'NULL', 'Comediante, Actor/Actriz', 'NULL', 'NULL', 'NULL'],
+            ['Federico Coria', 32, 'NULL', '9-3-1992', 'NULL', 'Tenista', 'NULL', 'NULL', 'NULL'],
+            ['Pablo Kenny', 125, 'NULL', '1-1-1900', 'NULL', 'Productor/a', 'NULL', 'NULL', 'NULL'],
+            ['Pablo Migliore', 42, 'NULL', '27-1-1982', 'NULL', 'Exfutbolista', 'NULL', 'NULL', 'NULL'],
+            ['Cesar Luis Merlo', 125, 'NULL', '1-1-1900', 'NULL', 'Periodista Deportivo', 'NULL', 'NULL', 'NULL'],
+            ['Mike la Maquina del Mal', 31, 'NULL', '31-7-1993', 'NULL', 'Influencer', 'NULL', 'NULL', 'NULL'],
+            ['Will Futbolito', 24, 'NULL', '29-6-2000', 'NULL', 'Streamer', 'NULL', 'NULL', 'NULL'],
+            ['Skone', 35, 'NULL', '27-12-1989', 'NULL', 'Freestyler', 'NULL', 'NULL', 'NULL'],
+            ['Beto Casella', 64, 'NULL', '29-3-1960', 'NULL', 'Periodista', 'NULL', 'NULL', 'NULL'],
+            ['Walter Nelson', 74, 'NULL', '16-8-1950', 'NULL', 'Periodista Deportivo', 'NULL', 'NULL', 'NULL'],
+            ['Alejandro Fabbri', 68, 'NULL', '28-4-1956', 'NULL', 'Periodista Deportivo', 'NULL', 'NULL', 'NULL'],
+            ['Marti Benza', 24, 'NULL', '26-8-2000', 'NULL', 'Youtuber', 'NULL', 'NULL', 'NULL'],
+            ['Nazareno Casero', 125, 'NULL', '1-1-1900', 'NULL', 'Actor/Actriz', 'NULL', 'NULL', 'NULL'],
+            ['Neo Pistea', 30, 'NULL', '5-10-1994', 'NULL', 'Músico/a', 'NULL', 'NULL', 'NULL'],
+            ['Caro Pardiaco', 125, 'NULL', '1-1-1900', 'NULL', 'Influencer', 'NULL', 'NULL', 'NULL'],
+            ['Nico Vazquez', 47, 'NULL', '12-6-1977', 'NULL', 'Actor/Actriz', 'NULL', 'NULL', 'NULL'],
+            ['Furia', 33, 'NULL', '18-3-1991', 'NULL', 'Exparticipante de GH', 'NULL', 'NULL', 'NULL'],
+            ['Diego Leuco', 35, 'NULL', '16-10-1989', 'NULL', 'Periodista, Conductor/a', 'NULL', 'NULL', 'NULL'],
+            ['Gustavo Costas', 61, 'NULL', '28-2-1963', 'NULL', 'Exfutbolista, Director Técnico (Fútbol)', 'NULL', 'NULL', 'NULL'],
+            ['Stiffy', 125, 'NULL', '1-1-1900', 'NULL', 'Músico/a', 'NULL', 'NULL', 'NULL'],
+            ['AgustinFortnite2008', 125, 'NULL', '1-1-1900', 'NULL', 'Músico/a', 'NULL', 'NULL', 'NULL'],
+            ['Turrobaby', 17, 'NULL', '12-2-2007', 'NULL', 'Músico/a', 'NULL', 'NULL', 'NULL'],
+            ['Zell', 19, 'NULL', '25-2-2005', 'NULL', 'Músico/a', 'NULL', 'NULL', 'NULL'],
+            ['Trueno', 125, 'NULL', '1-1-1900', 'NULL', 'Freestyler, Músico/a', 'NULL', 'NULL', 'NULL'],
+            ['ManuelaQM', 125, 'NULL', '1-1-1900', 'NULL', 'Streamer', 'NULL', 'NULL', 'NULL'],
+            ['Viruzz', 125, 'NULL', '1-1-1900', 'NULL', 'Streamer', 'NULL', 'NULL', 'NULL'],
+            ['Guanyar', 125, 'NULL', '1-1-1900', 'NULL', 'Streamer', 'NULL', 'NULL', 'NULL']
         ];
     }
 

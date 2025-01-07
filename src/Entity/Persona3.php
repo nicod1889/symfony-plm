@@ -18,10 +18,10 @@ class Persona3 {
     #[ORM\Column(length: 50, nullable: true)]
     private ?string $apodo = null;
 
-    #[ORM\Column(type: "date")]
+    #[ORM\Column(type: "date", nullable: true)]
     private \DateTimeInterface $nacimiento;
 
-    #[ORM\Column(type: "integer")]
+    #[ORM\Column(type: "integer", nullable: true)]
     private int $edad;
 
     #[ORM\Column(length: 255, nullable: true)]

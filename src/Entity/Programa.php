@@ -31,21 +31,22 @@ class Programa {
     #[ORM\Column(length: 50)]
     private ?string $edicion = null;
 
-    /**
-     * @var Collection<int, Conductor>
-     */
-    #[ORM\ManyToMany(targetEntity: Conductor::class, mappedBy: 'programas')]
-    private Collection $conductores;
+    #[ORM\ManyToMany(targetEntity: Persona3::class)]
+    #[ORM\JoinTable(name: "programa_conductores")]
+    private $conductores;
 
-    /**
-     * @var Collection<int, Columnista>
-     */
-    #[ORM\ManyToMany(targetEntity: Columnista::class, mappedBy: 'programas')]
-    private Collection $columnistas;
+    #[ORM\ManyToMany(targetEntity: Persona3::class)]
+    #[ORM\JoinTable(name: "programa_columnistas")]
+    private $columnistas;
+
+    #[ORM\ManyToMany(targetEntity: Persona3::class)]
+    #[ORM\JoinTable(name: "programa_invitados")]
+    private $invitados;
 
     public function __construct() {
         $this->conductores = new ArrayCollection();
         $this->columnistas = new ArrayCollection();
+        $this->invitados = new ArrayCollection();
     }
 
     public function getId(): ?int {
@@ -102,47 +103,39 @@ class Programa {
         return $this;
     }
 
-    /**
-     * @return Collection<int, Conductor>
-     */
     public function getConductores(): Collection {
         return $this->conductores;
     }
 
-    public function addConductor(Conductor $conductor): static {
-        if (!$this->conductores->contains($conductor)) {
-            $this->conductores->add($conductor);
-            $conductor->addPrograma($this);
+    public function addConductor(Persona3 $persona): static {
+        if (!$this->conductores->contains($persona)) {
+            $this->conductores[] = $persona;
         }
+
         return $this;
     }
 
-    public function removeConductor(Conductor $conductor): static {
-        if ($this->conductores->removeElement($conductor)) {
-            $conductor->removePrograma($this);
-        }
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Columnista>
-     */
     public function getColumnistas(): Collection {
         return $this->columnistas;
     }
 
-    public function addColumnista(Columnista $columnista): static {
-        if (!$this->columnistas->contains($columnista)) {
-            $this->columnistas->add($columnista);
-            $columnista->addPrograma($this);
+    public function addColumnista(Persona3 $persona): static {
+        if (!$this->columnistas->contains($persona)) {
+            $this->columnistas[] = $persona;
         }
+
         return $this;
     }
 
-    public function removeColumnista(Columnista $columnista): static {
-        if ($this->columnistas->removeElement($columnista)) {
-            $columnista->removePrograma($this);
+    public function getInvitados(): Collection {
+        return $this->invitados;
+    }
+
+    public function addInvitado(Persona3 $persona): static {
+        if (!$this->invitados->contains($persona)) {
+            $this->invitados[] = $persona;
         }
+
         return $this;
     }
 }

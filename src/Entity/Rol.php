@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use App\Repository\Persona3Repository;
+use App\Repository\RolRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: RolRepository::class)]

@@ -3,7 +3,6 @@
 {% block title %}Programa index{% endblock %}
 
 {% block body %}
-<!--
     <h1 class="text-center">Listado de programas PLM</h1>
     <p class="text-center">Filtros</p>
 
@@ -98,12 +97,4 @@
         </ul>
     </div>
     {% endif %}
--->
-[
-{% for programa in paginator.results %}
-<p class="m-0">{{ programa.titulo }}</p>
-{% endfor %}
-]
-
-
 {% endblock %}

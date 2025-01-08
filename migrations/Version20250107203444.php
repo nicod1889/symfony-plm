@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20250106232932 extends AbstractMigration
+final class Version20250107203444 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -40,7 +40,7 @@ final class Version20250106232932 extends AbstractMigration
         $this->addSql('CREATE INDEX IDX_A7BB061512469DE2 ON producto (category_id)');
         $this->addSql('CREATE INDEX product_sku ON producto (sku)');
         $this->addSql('CREATE INDEX product_price ON producto (price)');
-        $this->addSql('CREATE TABLE programa (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, titulo VARCHAR(255) NOT NULL, fecha DATE NOT NULL, link_youtube VARCHAR(255) NOT NULL, miniatura VARCHAR(255) NOT NULL, edicion VARCHAR(50) NOT NULL)');
+        $this->addSql('CREATE TABLE programa (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, titulo VARCHAR(255) NOT NULL, fecha DATE NOT NULL, link_youtube VARCHAR(255) NOT NULL, link_spotify VARCHAR(255) DEFAULT NULL, miniatura_pequeña VARCHAR(255) NOT NULL, miniatura_grande VARCHAR(255) NOT NULL, edicion VARCHAR(50) DEFAULT NULL)');
         $this->addSql('CREATE TABLE programa_conductores (programa_id INTEGER NOT NULL, persona3_id INTEGER NOT NULL, PRIMARY KEY(programa_id, persona3_id), CONSTRAINT FK_7B0E6A61FD8A7328 FOREIGN KEY (programa_id) REFERENCES programa (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE, CONSTRAINT FK_7B0E6A61CE2D16BD FOREIGN KEY (persona3_id) REFERENCES persona3 (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE)');
         $this->addSql('CREATE INDEX IDX_7B0E6A61FD8A7328 ON programa_conductores (programa_id)');
         $this->addSql('CREATE INDEX IDX_7B0E6A61CE2D16BD ON programa_conductores (persona3_id)');

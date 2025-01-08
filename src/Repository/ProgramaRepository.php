@@ -16,7 +16,7 @@ class ProgramaRepository extends ServiceEntityRepository {
     }
 
     public function findLatest(int $page = 1): Paginator {
-        $qb = $this->createQueryBuilder('p')->orderBy('p.id', 'DESC');
+        $qb = $this->createQueryBuilder('p')->orderBy('p.id', 'ASC');
     
         return (new Paginator($qb))->paginate($page);
     }

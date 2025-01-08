@@ -19,7 +19,7 @@ class ProgramaController extends AbstractController {
         $programas = $programaRepository->findLatest($page);
     
         return $this->render('programa/index.html.twig', [
-            'paginator' => $programas,
+            'paginator' => $programas
         ]);
     }
 

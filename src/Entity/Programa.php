@@ -25,10 +25,16 @@ class Programa {
     #[ORM\Column(length: 255)]
     private ?string $linkYoutube = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $miniatura = null;
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $linkSpotify = null;
 
-    #[ORM\Column(length: 50)]
+    #[ORM\Column(length: 255)]
+    private ?string $miniaturaPequeña = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $miniaturaGrande = null;
+
+    #[ORM\Column(length: 50, nullable: true)]
     private ?string $edicion = null;
 
     #[ORM\ManyToMany(targetEntity: Persona3::class)]
@@ -83,12 +89,32 @@ class Programa {
         return $this;
     }
 
-    public function getMiniatura(): ?string {
-        return $this->miniatura;
+    public function getLinkSpotify(): ?string {
+        return $this->linkSpotify;
     }
 
-    public function setMiniatura(string $miniatura): static {
-        $this->miniatura = $miniatura;
+    public function setLinkSpotify(string $linkSpotify): static {
+        $this->linkSpotify = $linkSpotify;
+
+        return $this;
+    }
+
+    public function getMiniaturaPequeña(): ?string {
+        return $this->miniaturaPequeña;
+    }
+
+    public function setMiniaturaPequeña(string $miniaturaPequeña): static {
+        $this->miniaturaPequeña = $miniaturaPequeña;
+
+        return $this;
+    }
+
+    public function getMiniaturaGrande(): ?string {
+        return $this->miniaturaGrande;
+    }
+
+    public function setMiniaturaGrande(string $miniaturaGrande): static {
+        $this->miniaturaGrande = $miniaturaGrande;
 
         return $this;
     }

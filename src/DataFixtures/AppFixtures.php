@@ -31,8 +31,8 @@ final class AppFixtures extends Fixture {
         $this->loadUsers($manager);
         $this->loadTags($manager);
         $this->loadPosts($manager);
-        $this->loadPersona3($manager);
         $this->loadProgramas($manager);
+        $this->loadPersona3($manager);
         $this->vincularConductoresYColumnistas($manager);
     }
 
@@ -46,9 +46,8 @@ final class AppFixtures extends Fixture {
                 $programa->setTitulo($programaData->getTitulo());
                 $programa->setFecha($programaData->getFecha());
                 $programa->setLinkYoutube($programaData->getLinkYoutube());
-                $programa->setMiniatura($programaData->getMiniatura());
-                $programa->setEdicion('programa');
-    
+                $programa->setMiniaturaPequeña($programaData->getMiniaturaPequeña());
+                $programa->setMiniaturaGrande($programaData->getMiniaturaGrande());
                 $manager->persist($programa);
             }
     
@@ -74,10 +73,14 @@ final class AppFixtures extends Fixture {
                     continue;
                 }
 
+                $programa->setEdicion($programaData['edicion']);
+                $programa->setlinkSpotify($programaData['spotify']);
+
                 $conductores = $personaRepository->findBy(['id' => $programaData['conductores']]);
                 foreach ($conductores as $conductor) {
                     $programa->addConductor($conductor);
                 }
+
 
                 $columnistas = $personaRepository->findBy(['id' => $programaData['columnistas']]);
                 foreach ($columnistas as $columnista) {
@@ -231,7 +234,7 @@ final class AppFixtures extends Fixture {
             ['Louta', 30, 'NULL', '22-6-1994', 'NULL', 'Músico/a', 'NULL', 'NULL', 'NULL'],
             ['Patricio Garino', 31, 'NULL', '17-5-1993', 'NULL', 'Basquetbolista', 'NULL', 'NULL', 'NULL'],
             ['Davo Xeneize', 22, 'NULL', '4-12-2002', 'NULL', 'Streamer', 'NULL', 'NULL', 'NULL'],
-            ['Gaspar Benegas', 46, 'NULL', '7-1-1978', 'NULL', 'Músico/a', 'NULL', 'NULL', 'NULL'],
+            ['Gaspar Benegas', 47, 'NULL', '7-1-1978', 'NULL', 'Músico/a', 'NULL', 'NULL', 'NULL'],
             ['Alejandro Fantino', 53, 'NULL', '26-9-1971', 'NULL', 'Periodista', 'NULL', 'NULL', 'NULL'],
             ['Gonzalo Heredia', 42, 'NULL', '12-3-1982', 'NULL', 'Actor/Actriz', 'NULL', 'NULL', 'NULL'],
             ['Seba Varela del Rio', 37, 'NULL', '11-6-1987', 'NULL', 'Periodista', 'NULL', 'NULL', 'NULL'],
@@ -257,7 +260,6 @@ final class AppFixtures extends Fixture {
             ['Peto Menahem', 54, 'NULL', '28-2-1970', 'NULL', 'Actor/Actriz, Comediante', 'NULL', 'NULL', 'NULL'],
             ['Sergio Rondina', 53, 'NULL', '3-11-1971', 'NULL', 'Exfutbolista, Director Técnico (Futbol)', 'NULL', 'NULL', 'NULL'],
             ['Hernán Casciari', 53, 'NULL', '16-3-1971', 'NULL', 'Escritor/a', 'NULL', 'NULL', 'NULL'],
-            ['Gastón Sardelli (Airbag)', 40, 'NULL', '18-4-1984', 'NULL', 'Músico/a', 'NULL', 'NULL', 'NULL'],
             ['Patricio Sardelli (Airbag)', 38, 'NULL', '26-1-1986', 'NULL', 'Músico/a', 'NULL', 'NULL', 'NULL'],
             ['Guido Sardelli (Airbag)', 36, 'NULL', '5-12-1988', 'NULL', 'Músico/a', 'NULL', 'NULL', 'NULL'],
             ['Chino Leunis', 44, 'NULL', '9-9-1980', 'NULL', 'Conductor/a', 'NULL', 'NULL', 'NULL'],
@@ -313,7 +315,7 @@ final class AppFixtures extends Fixture {
             ['Kapanga', 125, 'NULL', '1-1-1900', 'NULL', 'Grupo Musical', 'NULL', 'NULL', 'NULL'],
             ['Juanse', 62, 'NULL', '3-6-1962', 'NULL', 'Músico/a', 'NULL', 'NULL', 'NULL'],
             ['Santi Motorizado', 44, 'NULL', '19-5-1980', 'NULL', 'Músico/a', 'NULL', 'NULL', 'NULL'],
-            ['Trinche', 27, 'NULL', '24-12-1997', 'NULL', 'Comediante', 'NULL', 'NULL', 'NULL'],
+            ['Trinche Dardik', 26, 'NULL', '24-12-1998', 'NULL', 'Comediante', 'NULL', 'NULL', 'NULL'],
             ['Fernando Signorini', 74, 'NULL', '7-12-1950', 'NULL', 'Preparador Físico', 'NULL', 'NULL', 'NULL'],
             ['BM', 25, 'NULL', '27-8-1999', 'NULL', 'Músico/a', 'NULL', 'NULL', 'NULL'],
             ['Laureano Staropoli', 31, 'NULL', '27-2-1993', 'NULL', 'Luchador MMA', 'NULL', 'NULL', 'NULL'],
@@ -341,7 +343,7 @@ final class AppFixtures extends Fixture {
             ['Flavio Azzaro', 39, 'NULL', '12-11-1985', 'NULL', 'Periodista Deportivo', 'NULL', 'NULL', 'NULL'],
             ['Duka', 63, 'NULL', '27-1-1961', 'NULL', 'Dirigente Deportivo', 'NULL', 'NULL', 'NULL'],
             ['Soy Rada', 41, 'NULL', '15-9-1983', 'NULL', 'Mago, Comediante', 'NULL', 'NULL', 'NULL'],
-            ['Oberto', 49, 'NULL', '21-3-1975', 'NULL', 'Exbasquetbolista', 'NULL', 'NULL', 'NULL'],
+            ['Fabricio Oberto', 49, 'NULL', '21-3-1975', 'NULL', 'Exbasquetbolista', 'NULL', 'NULL', 'NULL'],
             ['Sebastián Wainraich', 50, 'NULL', '23-5-1974', 'NULL', 'Periodista', 'NULL', 'NULL', 'NULL'],
             ['Mariano Zabaleta', 46, 'NULL', '28-2-1978', 'NULL', 'Extenista', 'NULL', 'NULL', 'NULL'],
             ['Juli Savioli', 22, 'NULL', '24-1-2002', 'NULL', 'Influencer', 'NULL', 'NULL', 'NULL'],

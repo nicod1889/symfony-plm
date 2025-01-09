@@ -7,7 +7,7 @@ use Doctrine\ORM\Tools\Pagination\CountWalker;
 use Doctrine\ORM\Tools\Pagination\Paginator as DoctrinePaginator;
 
 final class Paginator {
-    final public const PAGE_SIZE = 900;
+    final public const PAGE_SIZE = 9;
 
     private int $currentPage;
     private int $numResults;

@@ -36,6 +36,8 @@ class Programa {
 
     #[ORM\Column(length: 50, nullable: true)]
     private ?string $edicion = null;
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $comentario = null;
 
     #[ORM\ManyToMany(targetEntity: Persona3::class)]
     #[ORM\JoinTable(name: "programa_conductores")]
@@ -48,6 +50,9 @@ class Programa {
     #[ORM\ManyToMany(targetEntity: Persona3::class)]
     #[ORM\JoinTable(name: "programa_invitados")]
     private $invitados;
+
+    #[ORM\ManyToOne(inversedBy: 'programas')]
+    private ?Edicion $edicionClass = null;
 
     public function __construct() {
         $this->conductores = new ArrayCollection();
@@ -129,6 +134,16 @@ class Programa {
         return $this;
     }
 
+    public function getComentario(): ?string {
+        return $this->comentario;
+    }
+
+    public function setComentario(string $comentario): static {
+        $this->comentario = $comentario;
+
+        return $this;
+    }
+
     public function getConductores(): Collection {
         return $this->conductores;
     }
@@ -161,6 +176,16 @@ class Programa {
         if (!$this->invitados->contains($persona)) {
             $this->invitados[] = $persona;
         }
+
+        return $this;
+    }
+
+    public function getEdicionClass(): ?Edicion {
+        return $this->edicionClass;
+    }
+
+    public function setEdicionClass(?Edicion $edicionClass): static {
+        $this->edicionClass = $edicionClass;
 
         return $this;
     }

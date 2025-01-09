@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20250107203444 extends AbstractMigration
+final class Version20250108233717 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -30,6 +30,7 @@ final class Version20250107203444 extends AbstractMigration
         $this->addSql('CREATE TABLE conductor_programa (conductor_id INTEGER NOT NULL, programa_id INTEGER NOT NULL, PRIMARY KEY(conductor_id, programa_id), CONSTRAINT FK_FA046A3A49DECF0 FOREIGN KEY (conductor_id) REFERENCES conductor (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE, CONSTRAINT FK_FA046A3FD8A7328 FOREIGN KEY (programa_id) REFERENCES programa (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE)');
         $this->addSql('CREATE INDEX IDX_FA046A3A49DECF0 ON conductor_programa (conductor_id)');
         $this->addSql('CREATE INDEX IDX_FA046A3FD8A7328 ON conductor_programa (programa_id)');
+        $this->addSql('CREATE TABLE edicion (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, nombre VARCHAR(100) NOT NULL)');
         $this->addSql('CREATE TABLE edificio (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, name VARCHAR(50) NOT NULL, street VARCHAR(100) NOT NULL, number_street INTEGER NOT NULL)');
         $this->addSql('CREATE TABLE invitado (apodo VARCHAR(50) DEFAULT NULL, rubro VARCHAR(255) DEFAULT NULL, id INTEGER NOT NULL, PRIMARY KEY(id), CONSTRAINT FK_4982EC17BF396750 FOREIGN KEY (id) REFERENCES persona2 (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE)');
         $this->addSql('CREATE TABLE persona (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, nombre VARCHAR(50) NOT NULL, apellido VARCHAR(50) NOT NULL, dni INTEGER NOT NULL, edad INTEGER NOT NULL, club_id INTEGER DEFAULT NULL, CONSTRAINT FK_51E5B69B61190A32 FOREIGN KEY (club_id) REFERENCES club (id) NOT DEFERRABLE INITIALLY IMMEDIATE)');
@@ -40,7 +41,8 @@ final class Version20250107203444 extends AbstractMigration
         $this->addSql('CREATE INDEX IDX_A7BB061512469DE2 ON producto (category_id)');
         $this->addSql('CREATE INDEX product_sku ON producto (sku)');
         $this->addSql('CREATE INDEX product_price ON producto (price)');
-        $this->addSql('CREATE TABLE programa (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, titulo VARCHAR(255) NOT NULL, fecha DATE NOT NULL, link_youtube VARCHAR(255) NOT NULL, link_spotify VARCHAR(255) DEFAULT NULL, miniatura_pequeña VARCHAR(255) NOT NULL, miniatura_grande VARCHAR(255) NOT NULL, edicion VARCHAR(50) DEFAULT NULL)');
+        $this->addSql('CREATE TABLE programa (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, titulo VARCHAR(255) NOT NULL, fecha DATE NOT NULL, link_youtube VARCHAR(255) NOT NULL, link_spotify VARCHAR(255) DEFAULT NULL, miniatura_pequeña VARCHAR(255) NOT NULL, miniatura_grande VARCHAR(255) NOT NULL, edicion VARCHAR(50) DEFAULT NULL, comentario VARCHAR(255) DEFAULT NULL, edicion_class_id INTEGER DEFAULT NULL, CONSTRAINT FK_2F0140D6D63A7C7 FOREIGN KEY (edicion_class_id) REFERENCES edicion (id) NOT DEFERRABLE INITIALLY IMMEDIATE)');
+        $this->addSql('CREATE INDEX IDX_2F0140D6D63A7C7 ON programa (edicion_class_id)');
         $this->addSql('CREATE TABLE programa_conductores (programa_id INTEGER NOT NULL, persona3_id INTEGER NOT NULL, PRIMARY KEY(programa_id, persona3_id), CONSTRAINT FK_7B0E6A61FD8A7328 FOREIGN KEY (programa_id) REFERENCES programa (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE, CONSTRAINT FK_7B0E6A61CE2D16BD FOREIGN KEY (persona3_id) REFERENCES persona3 (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE)');
         $this->addSql('CREATE INDEX IDX_7B0E6A61FD8A7328 ON programa_conductores (programa_id)');
         $this->addSql('CREATE INDEX IDX_7B0E6A61CE2D16BD ON programa_conductores (persona3_id)');
@@ -76,6 +78,7 @@ final class Version20250107203444 extends AbstractMigration
         $this->addSql('DROP TABLE columnista_programa');
         $this->addSql('DROP TABLE conductor');
         $this->addSql('DROP TABLE conductor_programa');
+        $this->addSql('DROP TABLE edicion');
         $this->addSql('DROP TABLE edificio');
         $this->addSql('DROP TABLE invitado');
         $this->addSql('DROP TABLE persona');

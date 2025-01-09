@@ -46,11 +46,7 @@ class YoutubeService {
                     $programa->setFecha(new \DateTime($snippet['publishedAt']));
                     $programa->setLinkYoutube('https://www.youtube.com/watch?v='.$snippet['resourceId']['videoId']);
                     $programa->setMiniaturaPequeña($snippet['thumbnails']['medium']['url']);
-                    if (isset($snippet['thumbnails']['high'])) {
-                        $programa->setMiniaturaGrande($snippet['thumbnails']['high']['url']);
-                    } else {
-                        $programa->setMiniaturaGrande($snippet['thumbnails']['medium']['url']);
-                    }
+                    $programa->setMiniaturaGrande($snippet['thumbnails']['high']['url']);
 
                     array_unshift($programas, $programa);
                 }

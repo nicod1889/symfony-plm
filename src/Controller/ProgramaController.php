@@ -21,11 +21,10 @@ class ProgramaController extends AbstractController {
         $search = $request->query->get('search', '');
         $edicionId = $request->query->get('edicionId');
 
+        $ediciones = $edicionRepository->findByTipo('programa');
         $edicion = $edicionId ? $edicionRepository->find($edicionId) : null;
 
         $programas = $programaRepository->findLatest($page, $search, $edicion);
-
-        $ediciones = $edicionRepository->findAll();
 
         return $this->render('programa/index.html.twig', [
             'paginator' => $programas,

@@ -89,7 +89,9 @@ final class AppFixtures extends Fixture {
                 'PLF7Kn3e1aapZHZoqIW5kyOfT_9U2WRZyp' => 'Vlog EEUU - Copa América 2024 | Alfre',
                 'PLF7Kn3e1aapYIrmgWkGJ9NMKpVpq2jLIO' => 'Vlog Berlín y Paris | Alfre',
                 'PLF7Kn3e1aapYQPQjb-Hr74tGjs_D56yep' => 'Vlog París - Juegos Olimpicos 2024',
-                'PLF7Kn3e1aapb3qsy9bC5kUCY8sU40ZLCu' => 'Vlog México - Luquitas en la F1'
+                'PLF7Kn3e1aapb3qsy9bC5kUCY8sU40ZLCu' => 'Vlog México - Luquitas en la F1',
+                'PLF7Kn3e1aapZMQNtXGz-r4ompft78C_gk' => 'Párense de Manos I',
+                'PLF7Kn3e1aapbbzSkcDlQasjjbZzp3Mso6' => 'Párense de Manos II'
             ];
             $edicionRepository = $manager->getRepository(Edicion::class);
     
@@ -139,6 +141,14 @@ final class AppFixtures extends Fixture {
                 $programa->setEdicion($programaData['edicion']);
                 $programa->setlinkSpotify($programaData['spotify']);
                 $programa->setComentario($programaData['comentario']);
+                
+                // Convertir la fecha a un objeto DateTime
+                $fecha = \DateTime::createFromFormat('d-m-Y', $programaData['fecha']);
+                if ($fecha === false) {
+                    $this->logger->error('Formato de fecha inválido: ' . $programaData['fecha']);
+                    continue;
+                }
+                $programa->setFecha($fecha);
 
                 $edicion = $edicionRepository->findOneBy(['nombre' => $programaData['edicion']]);
                 if ($edicion) {
@@ -567,7 +577,9 @@ final class AppFixtures extends Fixture {
             ['Vlog EEUU - Copa América 2024 | Alfre', 'vlog'],
             ['Vlog Berlín y Paris | Alfre', 'vlog'],
             ['Vlog París - Juegos Olimpicos 2024', 'vlog'],
-            ['Vlog México - Luquitas en la F1', 'vlog']
+            ['Vlog México - Luquitas en la F1', 'vlog'],
+            ['Párense de Manos I', 'pdm'],
+            ['Párense de Manos II', 'pdm']
         ];
     }
 

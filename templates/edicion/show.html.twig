@@ -3,23 +3,25 @@
 {% block title %}Edicion{% endblock %}
 
 {% block body %}
-    <div class="text-center">
-        <h2>{{ edicion.nombre }}<h2>
-    </div>
-    <div class="row row-cols-1 row-cols-md-3 g-4 mt-5 mb-5 justify-content-center">
-        {% for vlog in edicion.vlogs %}
-        <div class="col mb-3">
-            <div class="card h-100">
-                <img src="{{ vlog.miniaturaPequeña }}" class="card-img-top" alt="Miniatura del vlog">
-                <div class="card-body">
-                    <h5 class="card-title">{{ vlog.titulo }}</h5>
-                </div>
-                <div class="card-footer text-center">
-                    <a class="btn btn-primary py-1 px-2 mr-2"> Más data </a>
-                    <a class="btn btn-danger py-1 px-2 mr-2" target="_blank" href=""> Youtube </a>
+    <div class="container py-5">
+        <div class="text-center">
+            <h2>{{ edicion.nombre }}<h2>
+        </div>
+        <div class="row row-cols-1 row-cols-md-3 g-4 mt-5 mb-5 justify-content-center">
+            {% for vlog in edicion.vlogs %}
+            <div class="col mb-3">
+                <div class="card h-100" style="background-color:rgb(33, 30, 44);">
+                    <img src="{{ vlog.miniaturaGrande }}" class="card-img-top" alt="Miniatura del vlog">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ vlog.titulo }}</h5>
+                    </div>
+                    <div class="card-footer text-center">
+                        <a class="btn btn-primary py-1 px-2 mr-2"> Más data </a>
+                        <a class="btn btn-danger py-1 px-2 mr-2" target="_blank" href=""> Youtube </a>
+                    </div>
                 </div>
             </div>
+            {% endfor %}
         </div>
-        {% endfor %}
     </div>
 {% endblock %}

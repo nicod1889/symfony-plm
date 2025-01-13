@@ -33,6 +33,28 @@ class ProgramaRepository extends ServiceEntityRepository {
 
         return (new Paginator($qb))->paginate($page);
     }
+
+    public function findLastProgram(): ?Programa {
+        return $this->createQueryBuilder('p')
+            ->orderBy('p.id', 'DESC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    public function findByYear(int $page = 1, int $year): Paginator {
+        $startDate = new \DateTime("$year-01-01");
+        $endDate = new \DateTime("$year-12-31");
+
+        $qb = $this->createQueryBuilder('p')
+                    ->andWhere('p.fecha BETWEEN :start AND :end')
+                    ->setParameter('start', $startDate)
+                    ->setParameter('end', $endDate)
+                    ->orderBy('p.id', 'ASC');
+
+        return (new Paginator($qb))->paginate($page);
+    }
+
     
 
     //    /**

@@ -34,6 +34,18 @@ class ProgramaController extends AbstractController {
         ]);
     }
 
+    #[Route('/{programYear<2022|2023|2024>}', name: 'programa_by_year', defaults: ['page' => 1], methods: ['GET'])]
+    #[Route('/{programYear<2022|2023|2024>}/page/{page<[0-9]\d*>}', name: 'programaAno_index_paginated', methods: ['GET'])]
+    public function programasPorAno(ProgramaRepository $programaRepository, EdicionRepository $edicionRepository, int $page, int $programYear): Response {
+        $programas = $programaRepository->findByYear($page, $programYear);
+
+        return $this->render('programa/ano.html.twig', [
+            'paginator' => $programas,
+            'year' => $programYear,
+        ]);
+    }
+
+
     #[Route('/presencias', name: 'app_programa_presencias', methods: ['GET'])]
     public function presencias(ProgramaRepository $programaRepository, Persona3Repository $persona3Repository): Response {
         $programas = $programaRepository->findAll();

@@ -14,6 +14,14 @@ class Persona3Repository extends ServiceEntityRepository {
         parent::__construct($registry, Persona3::class);
     }
 
+    public function findConductores(): array {
+        return $this->createQueryBuilder('p')
+            ->setMaxResults(5)
+            ->orderBy('p.id', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
     //    public function findOneBySomeField($value): ?Persona2
     //    {
     //        return $this->createQueryBuilder('p')

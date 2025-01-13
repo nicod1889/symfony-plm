@@ -1,0 +1,40 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Parense de Manos{% endblock %}
+
+{% block body %}
+
+    <div class="container py-5">
+    <h1 class="text-center mb-5">Toda la data sobre las dos ediciones de PDM<h1>
+
+    <a href="{{ path('app_edicion_show', {'id': 28}) }}" class="bg-image hover-zoom mx-auto text-center">
+        <img src="https://www.clarin.com/2023/12/20/5lmVxlGaK_1200x0__1.jpg" alt="" class="rounded zoom-effect">
+    </a>
+    <a href="{{ path('app_edicion_show', {'id': 29}) }}" class="bg-image hover-zoom mx-auto text-center mt-5">
+        <img src="https://pbs.twimg.com/media/GhCHEFgWoAA4emE?format=jpg" alt="" class="rounded zoom-effect">
+    </a>
+    </div>
+
+    <style>
+        .bg-image {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .zoom-effect {
+            transition: transform 0.5s ease;
+            max-width: 100%;
+            height: auto;
+        }
+
+        .zoom-effect:hover {
+            transform: scale(1.1);
+        }
+    </style>
+
+    
+{% endblock %}
+

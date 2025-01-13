@@ -5,23 +5,25 @@
 {% block body %}
     <h1 class="text-center mb-5">Todos los vlogs de la bandurria<h1>
     
-    {% for edicion in ediciones %}
-    <hr>
-    <div class="text-center mt-4">
-        <h3>{{ edicion.nombre }}<h3>
-        <a class="btn btn-primary py-1 px-2 mb-0" href="{{ path('app_edicion_show', {'id': edicion.id}) }}"> Ver todos los vlogs </a>
-    </div>
-    <div class="row row-cols-1 row-cols-md-3 g-4 mt-4 mb-5 justify-content-center">
-        {% for vlog in edicion.vlogs|slice(0, 3) %}
-        <div class="col mb-3">
-            <div class="card h-100">
-                <img src="{{ vlog.miniaturaPequeña }}" class="card-img-top" alt="Miniatura del vlog">
-                <div class="card-body">
-                    <h5 class="card-title">{{ vlog.titulo }}</h5>
+    <div class="container py-5">
+        {% for edicion in ediciones %}
+        <hr class="bg-white">
+        <div class="text-center mt-4">
+            <h3>{{ edicion.nombre }}<h3>
+            <a class="btn btn-primary py-1 px-2 mb-0" href="{{ path('app_edicion_show', {'id': edicion.id}) }}" style="background-color:rgb(33, 30, 44);"> Ver todos los vlogs </a>
+        </div>
+        <div class="row row-cols-1 row-cols-md-3 g-4 mt-4 mb-5 justify-content-center">
+            {% for vlog in edicion.vlogs|slice(0, 3) %}
+            <div class="col mb-3">
+                <div class="card h-100" style="background-color:rgb(33, 30, 44);">
+                    <img src="{{ vlog.miniaturaGrande }}" class="card-img-top" alt="Miniatura del vlog" style="max-height: 195px; min-height: 195px; object-fit: cover;">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ vlog.titulo }}</h5>
+                    </div>
                 </div>
             </div>
+            {% endfor %}
         </div>
         {% endfor %}
     </div>
-    {% endfor %}
 {% endblock %}

@@ -3,57 +3,60 @@
 {% block title %}Presencias de Conductores{% endblock %}
 
 {% block body %}
-    <h1>Tabla de Conductores</h1>
-    <table class="table table-striped mb-5">
-        <thead>
-            <tr>
-                <th class="w-75">Conductor</th>
-                <th class="text-center">Presencias</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for conductor in conductores %}
-                <tr>
-                    <td>{{ conductor.nombre }}</td>
-                    <td class="text-center">{{ conductor.presencias }}</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
 
-    <h1 class="mt-5">Tabla de Columnistas</h1>
-    <table class="table table-striped mb-5">
-        <thead>
-            <tr>
-                <th class="w-75">Columnista</th>
-                <th class="text-center">Presencias</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for columnista in columnistas %}
+    <div class="container py-5 text-white">
+        <h1>Tabla de Conductores</h1>
+        <table class="table table-striped mb-5 text-white">
+            <thead>
                 <tr>
-                    <td>{{ columnista.nombre }}</td>
-                    <td class="text-center">{{ columnista.presencias }}</td>
+                    <th class="w-75">Conductor</th>
+                    <th class="text-center">Presencias</th>
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                {% for conductor in conductores %}
+                    <tr>
+                        <td>{{ conductor.nombre }}</td>
+                        <td class="text-center">{{ conductor.presencias }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
 
-    <h1 class="mt-5">Tabla de Invitados</h1>
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th class="w-75">Invitado</th>
-                <th class="text-center">Presencias</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for invitado in invitados %}
+        <h1 class="mt-5">Tabla de Columnistas</h1>
+        <table class="table table-striped mb-5 text-white">
+            <thead>
                 <tr>
-                    <td>{{ invitado.nombre }}</td>
-                    <td class="text-center">{{ invitado.presencias }}</td>
+                    <th class="w-75">Columnista</th>
+                    <th class="text-center">Presencias</th>
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                {% for columnista in columnistas %}
+                    <tr>
+                        <td>{{ columnista.nombre }}</td>
+                        <td class="text-center">{{ columnista.presencias }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <h1 class="mt-5">Tabla de Invitados</h1>
+        <table class="table table-striped text-white">
+            <thead>
+                <tr>
+                    <th class="w-75">Invitado</th>
+                    <th class="text-center">Presencias</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for invitado in invitados %}
+                    <tr>
+                        <td>{{ invitado.nombre }}</td>
+                        <td class="text-center">{{ invitado.presencias }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 {% endblock %}

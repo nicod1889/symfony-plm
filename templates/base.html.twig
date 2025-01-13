@@ -14,60 +14,46 @@
         <link rel="shortcut icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
     </head>
 
-    <body id="{% block body_id %}{% endblock %}">
+    <body id="{% block body_id %}{% endblock %}" class="text-white"
+    style="background-image: url('https://pbs.twimg.com/media/GhHIMPJXAAAX60U?format=jpg'); background-size: cover; background-position: center; background-attachment: fixed;">
 
         {% block header %}
             {% set _route = app.request.get('_route') %}
-            <header>
-                <nav class="navbar navbar-expand-lg fixed-top navbar-dark bg-primary">
-                    <div class="container">
+            <header class="mb-5">
+                <nav class="navbar navbar-expand-lg fixed-top navbar-dark p-0 px-5" style="background-color: #312c42;">
+                    <div class="container-fluid">
                         <a class="navbar-brand" href="{{ path('homepage') }}">
-                            Symfony Demo
+                            <img src="https://pbs.twimg.com/media/GhB6DyEWsAAht7P?format=jpg&name=small" height="90">
                         </a>
-                        <button class="navbar-toggler collapsed" type="button" data-toggle="collapse" data-target="#appNavbar" aria-controls="appNavbar" aria-expanded="false" aria-label="Toggle navigation">
-                        <span class="navbar-toggler-icon"></span>
+                        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                            <span class="navbar-toggler-icon"></span>
                         </button>
-
                         <div class="navbar-collapse collapse" id="appNavbar">
-                            <ul class="navbar-nav ml-auto">
+                            <ul class="navbar-nav ml-auto mb-2 mb-lg-0">
                                 {% block header_navigation_links %}
-                                    <li class="nav-item{{ _route == 'blog_index' ? ' active' : '' }}">
-                                        <a class="nav-link" href="{{ path('blog_index') }}">
-                                            <i class="fa fa-home" aria-hidden="true"></i> {{ 'menu.homepage'|trans }}
-                                        </a>
+                                    <li class="nav-item{{ _route == 'home_index' ? ' active' : '' }}">
+                                        <a class="nav-link" href="{{ path('home_index') }}"> <i class="fa fa-home" aria-hidden="true"></i> Inicio </a>
                                     </li>
-                                    {% if is_granted('ROLE_ADMIN') %}
-                                        <li class="nav-item">
-                                            <a class="nav-link" href="{{ path('admin_post_index') }}">
-                                                <i class="fa fa-lock" aria-hidden="true"></i> {{ 'menu.admin'|trans }}
-                                            </a>
-                                        </li>
-                                    {% endif %}
+                                    <li class="nav-item{{ _route == 'app_persona3_index' ? ' active' : '' }}">
+                                        <a class="nav-link" href="{{ path('app_persona3_index') }}"> Integrantes </a>
+                                    </li>
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle{{ _route == 'app_programa_index' ? ' active' : '' }}" href="{{ path('app_programa_index') }}" data-bs-toggle="dropdown" aria-expanded="false"> Programas </a>
+                                        <ul class="dropdown-menu pb-0">
+                                            <li><a class="dropdown-item" href="{{ path('programaAno_index_paginated', {programYear: 2022, page: 1}) }}">2022</a></li>
+                                            <li><a class="dropdown-item" href="{{ path('programaAno_index_paginated', {programYear: 2023, page: 1}) }}">2023</a></li>
+                                            <li><a class="dropdown-item" href="{{ path('programaAno_index_paginated', {programYear: 2024, page: 1}) }}">2024</a></li>
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li><a class="dropdown-item" href="{{ path('app_programa_index') }}">Todos los programas</a></li>
+                                        </ul>
+                                    </li>
+                                    <li class="nav-item{{ _route == 'app_pdm_index' ? ' active' : '' }}">
+                                        <a class="nav-link" href="{{ path('app_pdm_index') }}"> Párense de Manos </a>
+                                    </li>
+                                    <li class="nav-item{{ _route == 'blog_search' ? ' active' : '' }}">
+                                        <a class="nav-link" href="{{ path('blog_search') }}"> <i class="fa fa-search"></i> {{ 'menu.search'|trans }}</a>
+                                    </li>
                                 {% endblock %}
-
-                                <li class="nav-item{{ _route == 'blog_search' ? ' active' : '' }}">
-                                    <a class="nav-link" href="{{ path('blog_search') }}"> <i class="fa fa-search"></i> {{ 'menu.search'|trans }}</a>
-                                </li>
-                                <li class="nav-item{{ _route == 'app_category_index' ? ' active' : '' }}">
-                                    <a class="nav-link" href="{{ path('app_category_index') }}">  
-                                        Categorias
-                                    </a>
-                                </li>
-                                <li class="nav-item{{ _route == 'app_producto_index' ? ' active' : '' }}">
-                                    <a class="nav-link" href="{{ path('app_producto_index') }}">  
-                                        Productos
-                                    </a>
-                                </li>
-                                <li class="nav-item{{ _route == 'app_persona_index' ? ' active' : '' }}">
-                                    <a class="nav-link" href="{{ path('app_persona_index') }}">  
-                                        Personas
-                                    </a>
-                                </li>
-                                <li class="nav-item{{ _route == 'app_club_index' ? ' active' : '' }}">
-                                    <a class="nav-link" href="{{ path('app_club_index') }}">  
-                                        Clubes
-                                    </a>
-                                </li>
 
                                 {% if app.user %}
                                     <li class="nav-item dropdown">
@@ -99,7 +85,7 @@
             </header>
         {% endblock %}
 
-        <div class="container body-container m-10">
+        <div class="container-fluid body-container px-5 mx-auto">
             {% block body %}
                 <div class="row">
                     <div id="main" class="col-sm-9">

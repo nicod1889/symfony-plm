@@ -3,10 +3,9 @@
 {% block title %}Programa index{% endblock %}
 
 {% block body %}
-    <h1 class="text-center">Listado de programas PLM</h1>
-    <p class="text-center">Filtros</p>
-
-    <div class="container py-5">
+    <div class="container py-5" style="background-color: #312c42;">
+        <h1 class="text-center">Listado de programas PLM</h1>
+        <p class="text-center">Filtros</p>
         <form method="get" action="{{ path('app_programa_index') }}">
             <div class="input-group mb-3 w-75 mt-5">
                 <input type="text" name="search" class="form-control mr-3" value="{{ search }}" placeholder="Buscar...">      

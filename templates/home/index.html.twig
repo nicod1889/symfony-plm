@@ -3,7 +3,7 @@
 {% block title %}PLM DB{% endblock %}
 
 {% block body %}
-    <div class="container py-5">
+    <div class="py-5 px-5 mt-0" style="background-color: #312c42;" >
         <div class="row align-items-center">
             <div class="col-md-6 text-white">
                 <h1 class="display-1 fw-bold">PLM DB</h1>
@@ -22,17 +22,17 @@
         </div>
     
         <h1 class="fw-bold mt-5 text-center">Mirá todos los programas!</h1>
-        <a href="{{ path('app_programa_index') }}" class="aa p-0 mx-auto ratio ratio-16x9"> 
+        <a href="{{ path('app_programa_index') }}" class="aa w-75 p-0 mx-auto ratio ratio-16x9"> 
             <img src="{{ programa.miniaturaGrande }}" alt="Imagen PLM" class="img-fluid object-fit-cover">
         </a>
 
-        <h1 class="fw-bold mt-5 text-center">Mirá todos los vlogs, pibe!</h1>
-        <div id="carouselVlogs" class="carousel slide" data-bs-ride="carousel">
+        <h1 class="fw-bold mt-5 text-center">Salen esos vlogs de la bandurria?</h1>
+        <div id="carouselVlogs" class="carousel slide w-75 mx-auto" data-bs-ride="carousel">
             <div class="carousel-inner">
                 {% for edicion in ediciones %}
                     <div class="carousel-item {% if loop.first %}active{% endif %}">
                         {% set firstVlog = edicion.vlogs|first %}
-                        <img src="{{ firstVlog.miniaturaGrande }}" class="d-block w-100 rounded-top img-fluid" alt="Imagen de la edición {{ edicion.nombre }}" style="max-height: 600px; object-fit: cover;">
+                        <img src="{{ firstVlog.miniaturaGrande }}" class="d-block w-100 rounded-top img-fluid" alt="Imagen de la edición {{ edicion.nombre }}" style="max-height: 400px; object-fit: cover;">
                         <div class="d-flex justify-content-center mb-0">
                             <div class="text-white p-2 w-100 text-center rounded-bottom" style="background-color: black;">
                                 <h5>{{ edicion.nombre }}</h5>
@@ -50,8 +50,8 @@
         </div>
     
 
-        <h1 class="fw-bold mt-5 text-center">Integrantes del programa</h1>
-        <div class="container">
+        <h1 class="fw-bold mt-5 text-center">El plantel fijo de PLM</h1>
+        <div class="mx-auto" style="width: 85%">
             <div class="row text-center">
                 {% for conductor in conductores %}
                     <div class="col-12 col-md-4 mb-4">
@@ -69,7 +69,7 @@
                 {% endfor %}
             </div>
             <div class="d-grid text-center w-100">
-                <button class="btn btn-primary w-50" style="background-color:rgb(33, 30, 44);" type="button">Más data de los muchachos</button>
+                <a href="{{ path('app_conductores_index') }}" class="btn btn-primary w-50" style="background-color:rgb(33, 30, 44);" type="button">Más data de los muchachos</a>
             </div>
         </div>
 
@@ -99,11 +99,4 @@
             transform: scale(1.1);
         }
     </style>
-
-    <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js" 
-            integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8" 
-            crossorigin="anonymous">
-    </script>
-
 {% endblock %}
-

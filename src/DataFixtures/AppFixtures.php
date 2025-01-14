@@ -35,6 +35,7 @@ final class AppFixtures extends Fixture {
         $this->loadPosts($manager);
         $this->loadEdiciones($manager);
         $this->loadProgramas($manager);
+        $this->loadProgramasManual($manager);
         $this->loadPersona3($manager);
         $this->loadVlogs($manager);
         $this->vincularConductoresYColumnistas($manager);
@@ -61,14 +62,75 @@ final class AppFixtures extends Fixture {
             $this->logger->error('Error al cargar los programas: ' . $e->getMessage());
         }
     }
-/*
-            ['Vlog España 2023 | Germán', 'vlog'],
-            ['Vlog Francia | Alfre', 'vlog'],
-            ['Vlog España | Alfre', 'vlog'],
-            ['Vlog Londres | Alfre', 'vlog'],
-            ['Vlog Japón | Luquitas', 'vlog'],
-            ['Vlog Roma | Luquitas', 'vlog']
-*/
+
+    private function loadProgramasManual(ObjectManager $manager): void {
+        $programa010322 = new Programa();
+        $programa010322->setTitulo('#ParenLaMano completo - 01/03');
+        $programa010322->setFecha(\DateTime::createFromFormat('d-m-Y', '01-03-2022'));
+        $manager->persist($programa010322);
+        $manager->flush();
+
+        $programa020322 = new Programa();
+        $programa020322->setTitulo('#ParenLaMano completo - 02/03');
+        $programa020322->setFecha(\DateTime::createFromFormat('d-m-Y', '01-03-2022'));
+        $manager->persist($programa020322);
+        $manager->flush();
+
+        $programa030322 = new Programa();
+        $programa030322->setTitulo('#ParenLaMano completo - 03/03');
+        $programa030322->setFecha(\DateTime::createFromFormat('d-m-Y', '01-03-2022'));
+        $manager->persist($programa030322);
+        $manager->flush();
+
+        $programa040322 = new Programa();
+        $programa040322->setTitulo('#ParenLaMano completo - 04/03');
+        $programa040322->setFecha(\DateTime::createFromFormat('d-m-Y', '01-03-2022'));
+        $manager->persist($programa040322);
+        $manager->flush();
+
+        $programa070322 = new Programa();
+        $programa070322->setTitulo('#ParenLaMano completo - 07/03');
+        $programa070322->setFecha(\DateTime::createFromFormat('d-m-Y', '01-03-2022'));
+        $manager->persist($programa070322);
+        $manager->flush();
+
+        $programa180322 = new Programa();
+        $programa180322->setTitulo('#ParenLaMano Completo - 18/03 | Vorterix');
+        $programa180322->setFecha(\DateTime::createFromFormat('d-m-Y', '01-03-2022'));
+        $manager->persist($programa180322);
+        $manager->flush();
+
+        $programa040422 = new Programa();
+        $programa040422->setTitulo('#ParenLaMano Completo - 04/04 | Vorterix');
+        $programa040422->setFecha(\DateTime::createFromFormat('d-m-Y', '04-04-2022'));
+        $manager->persist($programa040422);
+        $manager->flush();
+
+        $programa180522 = new Programa();
+        $programa180522->setTitulo('#ParenLaMano Completo - 18/05 | Vorterix');
+        $programa180522->setFecha(\DateTime::createFromFormat('d-m-Y', '18-05-2022'));
+        $manager->persist($programa180522);
+        $manager->flush();
+
+        $programa251022 = new Programa();
+        $programa251022->setTitulo('#ParenLaMano Completo - 25/10 | Vorterix');
+        $programa251022->setFecha(\DateTime::createFromFormat('d-m-Y', '25-10-2022'));
+        $manager->persist($programa251022);
+        $manager->flush();
+
+        $programa111122 = new Programa();
+        $programa111122->setTitulo('#ParenLaMano Completo - 11/11 | Vorterix');
+        $programa111122->setFecha(\DateTime::createFromFormat('d-m-Y', '11-11-2022'));
+        $manager->persist($programa111122);
+        $manager->flush();
+
+        $programa181122 = new Programa();
+        $programa181122->setTitulo('#ParenLaMano Completo - 18/11 | Vorterix');
+        $programa181122->setFecha(\DateTime::createFromFormat('d-m-Y', '18-11-2022'));
+        $manager->persist($programa181122);
+        $manager->flush();
+    }
+
     private function loadVlogs(ObjectManager $manager): void {
         try {
             $playlists = [
@@ -131,18 +193,17 @@ final class AppFixtures extends Fixture {
             $edicionRepository = $manager->getRepository(Edicion::class);
     
             foreach ($programasData as $programaData) {
-                $programa = $manager->getRepository(Programa::class)->findOneBy(['titulo' => $programaData['titulo']]);
-                $this->logger->info('Buscando programa con título: ' . $programaData['titulo']);
+                $programa = $manager->getRepository(Programa::class)->findOneBy(['linkYoutube' => $programaData['youtube']]);
                 if (!$programa) {
-                    $this->logger->error('No se encontró el programa con el título: ' . $programaData['titulo']);
+                    $this->logger->error('No se encontró el programa con el título: ' . $programaData['youtube'] . 'y fecha ' . $programaData['fecha']);
                     continue;
                 }
 
+                $programa->setTitulo($programaData['titulo']);
                 $programa->setEdicion($programaData['edicion']);
                 $programa->setlinkSpotify($programaData['spotify']);
                 $programa->setComentario($programaData['comentario']);
                 
-                // Convertir la fecha a un objeto DateTime
                 $fecha = \DateTime::createFromFormat('d-m-Y', $programaData['fecha']);
                 if ($fecha === false) {
                     $this->logger->error('Formato de fecha inválido: ' . $programaData['fecha']);
@@ -281,10 +342,10 @@ final class AppFixtures extends Fixture {
             ['Alfredo Montes de Oca', 44, 'https://pbs.twimg.com/media/GOtrfjgW4AAIbOT?format=jpg&name=small', '17-9-1980', 'Alfre', 'Periodista', 'https://www.instagram.com/alfremontes/', 'https://twitter.com/alfremontes', 'https://www.youtube.com/@Alfremontes'],
             ['Roberto Galati', 40, 'https://pbs.twimg.com/media/GOtsLQRXYAA-Nym?format=jpg&name=small', '20-2-1984', 'Rober', 'Comediante', 'https://www.instagram.com/robergalati/', 'https://twitter.com/robergalati', 'https://www.youtube.com/@robergalati3366'],
             ['Joaquín Cavanna', 42, 'https://pbs.twimg.com/media/GOw331DWcAAizab?format=jpg&name=small', '17-4-1982', 'Joaco', 'Periodista', 'https://www.instagram.com/joacavanna/', 'https://twitter.com/joacavanna', 'https://www.youtube.com/@joacavanna'],
-            ['Tomás Rebord', 31, 'https://pbs.twimg.com/media/GOw331DWcAAizab?format=jpg&name=small', '6-7-1993', 'Rebord', 'Abogado/a, Conductor/a', 'NULL', 'NULL', 'NULL'],
+            ['Tomás Rebord', 31, 'https://www.planetadelibros.com.ar/usuaris/autores/fotos/85/original/000084137_1_TomsRebord_202403111655.jpg', '6-7-1993', 'Rebord', 'Abogado/a, Conductor/a', 'NULL', 'NULL', 'NULL'],
             ['Juan Igal', 25, 'https://pbs.twimg.com/media/GOwzhqtWIAMsZ-C?format=jpg&name=small', '7-7-1999', 'Igal', 'Streamer', 'NULL', 'NULL', 'NULL'],
-            ['Noski', 125, 'NULL', '1-1-1900', 'Noski', 'Twittero/a', 'NULL', 'NULL', 'NULL'],
-            ['Juan Castro', 43, 'https://pbs.twimg.com/media/Ga3QY1PWEAAbnfN?format=png&name=small', '29-1-1981', 'Juancaster', 'Periodista', 'NULL', 'NULL', 'NULL'],
+            ['Noski', 125, 'https://pbs.twimg.com/media/GhMXCmqXYAAhfUQ?format=jpg&name=small', '1-1-1900', 'Noski', 'Twittero/a', 'NULL', 'NULL', 'NULL'],
+            ['Juan Castro', 43, 'https://pbs.twimg.com/media/GhMXp3eXEAA3XBg?format=jpg&name=small', '29-1-1981', 'Juancaster', 'Periodista', 'NULL', 'NULL', 'NULL'],
             ['Alexis Valido', 40, 'https://pbs.twimg.com/media/GOwyvV3XIAEWoEf?format=jpg&name=small', '17-7-1984', 'Alexis', 'Productor/a, Músico/a', 'NULL', 'NULL', 'NULL'],
             ['Julian Kartun', 41, 'NULL', '7-11-1983', 'NULL', 'Músico, Actor/Actriz', 'NULL', 'NULL', 'NULL'],
             ['Luis Ventura', 68, 'NULL', '14-1-1956', 'NULL', 'Periodista, DT', 'NULL', 'NULL', 'NULL'],
@@ -579,7 +640,11 @@ final class AppFixtures extends Fixture {
             ['Vlog París - Juegos Olimpicos 2024', 'vlog'],
             ['Vlog México - Luquitas en la F1', 'vlog'],
             ['Párense de Manos I', 'pdm'],
-            ['Párense de Manos II', 'pdm']
+            ['Párense de Manos II', 'pdm'],
+            ['Estudio 2024', 'programa'],
+            ['Copa América - Estados Unidos 2024', 'programa'],
+            ['España 2024', 'programa'],
+            ['Personajes del año 2024', 'programa']
         ];
     }
 

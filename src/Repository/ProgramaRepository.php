@@ -19,7 +19,7 @@ class ProgramaRepository extends ServiceEntityRepository {
 
     public function findLatest(int $page = 1, string $search = '', ?Edicion $edicion = null): Paginator {
         $qb = $this->createQueryBuilder('p')
-        ->orderBy('p.id', 'ASC');
+        ->orderBy('p.fecha', 'ASC');
 
         if ($search) {
             $qb->andWhere('p.titulo LIKE :search')

@@ -4,13 +4,13 @@
 
 {% block body %}
 
-    <div class="container py-5">
+    <div class="container py-5" style="background-color: #312c42;">
     <h1 class="text-center mb-5">Toda la data sobre las dos ediciones de PDM<h1>
 
-    <a href="{{ path('app_edicion_show', {'id': 28}) }}" class="bg-image hover-zoom mx-auto text-center">
+    <a href="{{ path('app_edicion_show', {'id': 28}) }}" class="bg-image hover-zoom mx-auto text-center w-75">
         <img src="https://www.clarin.com/2023/12/20/5lmVxlGaK_1200x0__1.jpg" alt="" class="rounded zoom-effect">
     </a>
-    <a href="{{ path('app_edicion_show', {'id': 29}) }}" class="bg-image hover-zoom mx-auto text-center mt-5">
+    <a href="{{ path('app_edicion_show', {'id': 29}) }}" class="bg-image hover-zoom mx-auto text-center mt-5 w-75">
         <img src="https://pbs.twimg.com/media/GhCHEFgWoAA4emE?format=jpg" alt="" class="rounded zoom-effect">
     </a>
     </div>
@@ -37,4 +37,3 @@
 
     
 {% endblock %}
-

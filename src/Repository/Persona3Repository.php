@@ -7,7 +7,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Persona2>
+ * @extends ServiceEntityRepository<Persona3>
  */
 class Persona3Repository extends ServiceEntityRepository {
     public function __construct(ManagerRegistry $registry) {
@@ -18,6 +18,21 @@ class Persona3Repository extends ServiceEntityRepository {
         return $this->createQueryBuilder('p')
             ->setMaxResults(5)
             ->orderBy('p.id', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findColumnistas(): array {
+        $ids = [6, 7, 8, 5, 9, 10];
+    
+        $caseExpression = '';
+        foreach ($ids as $index => $id) {
+            $caseExpression .= "WHEN p.id = $id THEN $index ";
+        }
+    
+        return $this->createQueryBuilder('p')
+            ->where('p.id IN (:ids)')
+            ->setParameter('ids', $ids)
             ->getQuery()
             ->getResult();
     }

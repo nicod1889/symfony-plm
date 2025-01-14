@@ -22,16 +22,16 @@ class Programa {
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $fecha = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $linkYoutube = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $linkSpotify = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $miniaturaPequeña = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $miniaturaGrande = null;
 
     #[ORM\Column(length: 50, nullable: true)]

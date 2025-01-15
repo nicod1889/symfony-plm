@@ -3,7 +3,8 @@
 {% block title %}Vlog index{% endblock %}
 
 {% block body %}
-    <h1 class="text-center mb-5">Todos los vlogs de la bandurria<h1>
+<div class="py-5 px-5 mt-0 mx-auto" style="background-color: #312c42; width: 95%;" >
+    <h1 class="text-center">Todos los vlogs de la bandurria<h1>
     
     <div class="container py-5">
         {% for edicion in ediciones %}
@@ -16,7 +17,7 @@
             {% for vlog in edicion.vlogs|slice(0, 3) %}
             <div class="col mb-3">
                 <div class="card h-100" style="background-color:rgb(33, 30, 44);">
-                    <img src="{{ vlog.miniaturaGrande }}" class="card-img-top" alt="Miniatura del vlog" style="max-height: 195px; min-height: 195px; object-fit: cover;">
+                    <img src="{{ vlog.miniaturaGrande }}" class="card-img-top" alt="Miniatura del vlog" >
                     <div class="card-body">
                         <h5 class="card-title">{{ vlog.titulo }}</h5>
                     </div>
@@ -26,4 +27,5 @@
         </div>
         {% endfor %}
     </div>
+</div>
 {% endblock %}

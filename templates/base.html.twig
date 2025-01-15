@@ -54,6 +54,12 @@
                                             <li><a class="dropdown-item" href="{{ path('app_programa_index') }}">Todos los programas</a></li>
                                         </ul>
                                     </li>
+                                    <li class="nav-item{{ _route == 'app_vlog_index' ? ' active' : '' }}">
+                                        <a class="nav-link" href="{{ path('app_vlog_index') }}"> Vlogs </a>
+                                    </li>
+                                    <li class="nav-item{{ _route == 'app_vlog_index' ? ' active' : '' }}">
+                                        <a class="nav-link" href="{{ path('app_vlog_index') }}"> Clips </a>
+                                    </li>
                                     <li class="nav-item{{ _route == 'app_pdm_index' ? ' active' : '' }}">
                                         <a class="nav-link" href="{{ path('app_pdm_index') }}"> Párense de Manos </a>
                                     </li>

@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Persona3;
 use App\Form\Persona3Type;
 use App\Repository\Persona3Repository;
+use App\Repository\ProgramaRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,9 +22,37 @@ class Persona3Controller extends AbstractController {
     }
 
     #[Route('/conductores', name: 'app_conductores_index', methods: ['GET'])] 
-    public function conductores(Persona3Repository $persona3Repository): Response   {
+    public function conductores(Persona3Repository $persona3Repository, ProgramaRepository $programaRepository): Response   {
+        $programas = $programaRepository->findAll();
+
+        $conductorPresencias = [];
+        foreach ($programas as $programa) {
+            foreach ($programa->getConductores() as $conductor) {
+                $conductorId = $conductor->getId();
+                if (!isset($conductorPresencias[$conductorId])) {
+                    $conductorPresencias[$conductorId] = 0;
+                }
+                $conductorPresencias[$conductorId]++;
+            }
+        }
+        
+        $tabla = [];
+        foreach ($conductorPresencias as $conductorId => $presencias) {
+            $conductor = $persona3Repository->find($conductorId);
+            if ($conductor) {
+                $tabla[] = [
+                    'nombre' => $conductor->getNombre(),
+                    'presencias' => $presencias,
+                ];
+            }
+        }
+        usort($tabla, function($a, $b) {
+            return $b['presencias'] - $a['presencias'];
+        });    
+
         return $this->render('persona3/conductores.html.twig', [
             'conductores' => $persona3Repository->findConductores(),
+            'tabla' => $tabla
         ]);
     }
 
@@ -32,58 +61,5 @@ class Persona3Controller extends AbstractController {
         return $this->render('persona3/columnistas.html.twig', [
             'columnistas' => $persona3Repository->findColumnistas(),
         ]);
-    }
-
-    #[Route('/new', name: 'app_persona3_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response {
-        $persona3 = new Persona3();
-        $form = $this->createForm(Persona3Type::class, $persona3);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($persona3);
-            $entityManager->flush();
-
-            return $this->redirectToRoute('app_persona3_index', [], Response::HTTP_SEE_OTHER);
-        }
-
-        return $this->render('persona3/new.html.twig', [
-            'persona3' => $persona3,
-            'form' => $form,
-        ]);
-    }
-
-    #[Route('/{id}', name: 'app_persona3_show', methods: ['GET'])]
-    public function show(Persona3 $persona3): Response {
-        return $this->render('persona3/show.html.twig', [
-            'persona3' => $persona3,
-        ]);
-    }
-
-    #[Route('/{id}/edit', name: 'app_persona3_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Persona3 $persona3, EntityManagerInterface $entityManager): Response {
-        $form = $this->createForm(Persona3Type::class, $persona3);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
-
-            return $this->redirectToRoute('app_persona3_index', [], Response::HTTP_SEE_OTHER);
-        }
-
-        return $this->render('persona3/edit.html.twig', [
-            'persona3' => $persona3,
-            'form' => $form,
-        ]);
-    }
-
-    #[Route('/{id}', name: 'app_persona3_delete', methods: ['POST'])]
-    public function delete(Request $request, Persona3 $persona3, EntityManagerInterface $entityManager): Response {
-        if ($this->isCsrfTokenValid('delete'.$persona3->getId(), $request->getPayload()->get('_token'))) {
-            $entityManager->remove($persona3);
-            $entityManager->flush();
-        }
-
-        return $this->redirectToRoute('app_persona3_index', [], Response::HTTP_SEE_OTHER);
     }
 }

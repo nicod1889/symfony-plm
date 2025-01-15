@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Clip index{% endblock %}
+
+{% block body %}
+    <h1>Clip index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Titulo</th>
+                <th>Miniatura</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for clip in clips %}
+            <tr>
+                <td>{{ clip.id }}</td>
+                <td>{{ clip.titulo }}</td>
+                <td>{{ clip.miniatura }}</td>
+                <td>
+                    <a href="{{ path('app_clip_show', {'id': clip.id}) }}">show</a>
+                    <a href="{{ path('app_clip_edit', {'id': clip.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="4">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_clip_new') }}">Create new</a>
+{% endblock %}

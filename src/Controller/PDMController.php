@@ -26,11 +26,4 @@ class PDMController extends AbstractController {
             'ediciones' => $ediciones
         ]);
     }
-
-    #[Route('/1', name: 'app_pdm1_show', methods: ['GET'])]
-    public function show(Edicion $edicion): Response {
-        return $this->render('edicion/show.html.twig', [
-            'edicion' => $edicion,
-        ]);
-    }
 }

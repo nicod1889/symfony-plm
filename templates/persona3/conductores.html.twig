@@ -3,7 +3,7 @@
 {% block title %}PLM DB{% endblock %}
 
 {% block body %}
-<div class="py-5 px-5 mt-0" style="background-color: #312c42;" >
+<div class="py-5 px-5 mt-0 mx-auto" style="background-color: #312c42; width: 95%;" >
     <h1 class="fw-bold text-center">El plantel fijo de PLM</h1>
     <div class="mx-auto" style="width: 100%">
         <div class="row text-center">
@@ -23,6 +23,24 @@
             {% endfor %}
         </div>
     </div>
+
+    <h1 class="mt-5 text-center">El profe Porrini tomó lista y así quedó la tabla</h1>
+        <table class="table table-striped mb-5 w-75 mx-auto mt-4 text-white">
+            <thead>
+                <tr>
+                    <th class="w-75">Conductor</th>
+                    <th class="text-center">Presencias</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for conductor in tabla %}
+                    <tr>
+                        <td>{{ conductor.nombre }}</td>
+                        <td class="text-center">{{ conductor.presencias }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
 </div>
 
 {% endblock %}

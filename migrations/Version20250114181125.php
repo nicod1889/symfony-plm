@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20250114033153 extends AbstractMigration
+final class Version20250114181125 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -21,6 +21,8 @@ final class Version20250114033153 extends AbstractMigration
     {
         // this up() migration is auto-generated, please modify it to your needs
         $this->addSql('CREATE TABLE category (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, name VARCHAR(50) NOT NULL, created_on DATETIME NOT NULL)');
+        $this->addSql('CREATE TABLE clip (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, titulo VARCHAR(255) NOT NULL, miniatura VARCHAR(255) DEFAULT NULL, programa_id INTEGER DEFAULT NULL, CONSTRAINT FK_AD201467FD8A7328 FOREIGN KEY (programa_id) REFERENCES programa (id) NOT DEFERRABLE INITIALLY IMMEDIATE)');
+        $this->addSql('CREATE INDEX IDX_AD201467FD8A7328 ON clip (programa_id)');
         $this->addSql('CREATE TABLE club (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, name VARCHAR(50) NOT NULL, city VARCHAR(50) NOT NULL, socios INTEGER NOT NULL)');
         $this->addSql('CREATE TABLE columnista (apodo VARCHAR(50) DEFAULT NULL, columna VARCHAR(50) DEFAULT NULL, id INTEGER NOT NULL, PRIMARY KEY(id), CONSTRAINT FK_9083851CBF396750 FOREIGN KEY (id) REFERENCES persona2 (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE)');
         $this->addSql('CREATE TABLE columnista_programa (columnista_id INTEGER NOT NULL, programa_id INTEGER NOT NULL, PRIMARY KEY(columnista_id, programa_id), CONSTRAINT FK_D9878D9A41382120 FOREIGN KEY (columnista_id) REFERENCES columnista (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE, CONSTRAINT FK_D9878D9AFD8A7328 FOREIGN KEY (programa_id) REFERENCES programa (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE)');
@@ -75,6 +77,7 @@ final class Version20250114033153 extends AbstractMigration
     {
         // this down() migration is auto-generated, please modify it to your needs
         $this->addSql('DROP TABLE category');
+        $this->addSql('DROP TABLE clip');
         $this->addSql('DROP TABLE club');
         $this->addSql('DROP TABLE columnista');
         $this->addSql('DROP TABLE columnista_programa');

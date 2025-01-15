@@ -54,10 +54,17 @@ class Programa {
     #[ORM\ManyToOne(inversedBy: 'programas')]
     private ?Edicion $edicionClass = null;
 
+    /**
+     * @var Collection<int, Clip>
+     */
+    #[ORM\OneToMany(targetEntity: Clip::class, mappedBy: 'programa')]
+    private Collection $clips;
+
     public function __construct() {
         $this->conductores = new ArrayCollection();
         $this->columnistas = new ArrayCollection();
         $this->invitados = new ArrayCollection();
+        $this->clips = new ArrayCollection();
     }
 
     public function getId(): ?int {
@@ -70,7 +77,6 @@ class Programa {
 
     public function setTitulo(string $titulo): static {
         $this->titulo = $titulo;
-
         return $this;
     }
 
@@ -80,7 +86,6 @@ class Programa {
 
     public function setFecha(\DateTimeInterface $fecha): static {
         $this->fecha = $fecha;
-
         return $this;
     }
 
@@ -90,7 +95,6 @@ class Programa {
 
     public function setLinkYoutube(string $linkYoutube): static {
         $this->linkYoutube = $linkYoutube;
-
         return $this;
     }
 
@@ -100,7 +104,6 @@ class Programa {
 
     public function setLinkSpotify(string $linkSpotify): static {
         $this->linkSpotify = $linkSpotify;
-
         return $this;
     }
 
@@ -110,7 +113,6 @@ class Programa {
 
     public function setMiniaturaPequeña(string $miniaturaPequeña): static {
         $this->miniaturaPequeña = $miniaturaPequeña;
-
         return $this;
     }
 
@@ -120,7 +122,6 @@ class Programa {
 
     public function setMiniaturaGrande(string $miniaturaGrande): static {
         $this->miniaturaGrande = $miniaturaGrande;
-
         return $this;
     }
 
@@ -130,7 +131,6 @@ class Programa {
 
     public function setEdicion(string $edicion): static {
         $this->edicion = $edicion;
-
         return $this;
     }
 
@@ -140,7 +140,6 @@ class Programa {
 
     public function setComentario(string $comentario): static {
         $this->comentario = $comentario;
-
         return $this;
     }
 
@@ -152,7 +151,6 @@ class Programa {
         if (!$this->conductores->contains($persona)) {
             $this->conductores[] = $persona;
         }
-
         return $this;
     }
 
@@ -164,7 +162,6 @@ class Programa {
         if (!$this->columnistas->contains($persona)) {
             $this->columnistas[] = $persona;
         }
-
         return $this;
     }
 
@@ -176,7 +173,6 @@ class Programa {
         if (!$this->invitados->contains($persona)) {
             $this->invitados[] = $persona;
         }
-
         return $this;
     }
 
@@ -186,7 +182,30 @@ class Programa {
 
     public function setEdicionClass(?Edicion $edicionClass): static {
         $this->edicionClass = $edicionClass;
+        return $this;
+    }
 
+    /**
+     * @return Collection<int, Clip>
+     */
+    public function getClips(): Collection {
+        return $this->clips;
+    }
+
+    public function addClip(Clip $clip): static {
+        if (!$this->clips->contains($clip)) {
+            $this->clips->add($clip);
+            $clip->setPrograma($this);
+        }
+        return $this;
+    }
+
+    public function removeClip(Clip $clip): static {
+        if ($this->clips->removeElement($clip)) {
+            if ($clip->getPrograma() === $this) {
+                $clip->setPrograma(null);
+            }
+        }
         return $this;
     }
 }

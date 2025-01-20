@@ -49,9 +49,7 @@ class YoutubeService {
                     $programa->setTitulo($snippet['title']);
                     $programa->setFecha(new \DateTime($snippet['publishedAt']));
                     $programa->setLinkYoutube('https://www.youtube.com/watch?v='.$snippet['resourceId']['videoId']);
-                    $programa->setMiniaturaPequeña($snippet['thumbnails']['medium']['url']);
-                    //$programa->setMiniaturaGrande($snippet['thumbnails']['high']['url']);
-                    $programa->setMiniaturaGrande($snippet['thumbnails']['maxres']['url']);
+                    $programa->setMiniatura($snippet['thumbnails']['maxres']['url']);
 
                     array_unshift($programas, $programa);
                 }
@@ -89,19 +87,15 @@ class YoutubeService {
                     $snippet = $item['snippet'];
                     $vlog = new Vlog();
                     $vlog->setTitulo($snippet['title']);
-                    $vlog->setMiniaturaPequeña($snippet['thumbnails']['high']['url']);
-                    //$vlog->setMiniaturaGrande($snippet['thumbnails']['high']['url']);
-                    //$vlog->setMiniaturaGrande($snippet['thumbnails']['maxres']['url']);
+                    $vlog->setMiniatura($snippet['thumbnails']['high']['url']);
                     if (isset($snippet['thumbnails']['maxres']['url'])) {
-                        $vlog->setMiniaturaGrande($snippet['thumbnails']['maxres']['url']);
-                    } elseif (isset($snippet['thumbnails']['standard']['url'])) {
-                        $vlog->setMiniaturaGrande($snippet['thumbnails']['standard']['url']);
+                        $vlog->setMiniatura($snippet['thumbnails']['maxres']['url']);
                     } elseif (isset($snippet['thumbnails']['medium']['url'])) {
-                        $vlog->setMiniaturaGrande($snippet['thumbnails']['medium']['url']);
+                        $vlog->setMiniatura($snippet['thumbnails']['medium']['url']);
                     } elseif (isset($snippet['thumbnails']['default']['url'])) {
-                        $vlog->setMiniaturaGrande($snippet['thumbnails']['default']['url']);
+                        $vlog->setMiniatura($snippet['thumbnails']['default']['url']);
                     } else {
-                        $vlog->setMiniaturaGrande(null); // No hay miniatura disponible
+                        $vlog->setMiniatura(null);
                     }
                     
                     array_unshift($vlogs, $vlog);
@@ -114,5 +108,44 @@ class YoutubeService {
         } while ($nextPageToken);
         
         return $vlogs;
+    }
+
+    public function getColumnasFromPlaylist(string $playlistId): array {
+        $columnas = [];
+        $nextPageToken = null;
+
+        do {
+            $url = sprintf(
+                '%s?part=snippet&playlistId=%s&maxResults=50&key=%s%s',
+                $this->youtubeApiUrl,
+                $playlistId,
+                $this->apiKey,
+                $nextPageToken ? '&pageToken=' . $nextPageToken : ''
+            );
+
+            try {
+                $response = $this->httpClient->request('GET', $url);
+                $data = $response->toArray();
+            } catch (\Exception $e) {
+                throw new \RuntimeException('Error al comunicarse con la API de YouTube: ' . $e->getMessage());
+            }
+
+            if (isset($data['items'])) {
+                foreach ($data['items'] as $item) {
+                    $snippet = $item['snippet'];
+                    $columna = new Columna();
+                    $columna->setTitulo($snippet['title']);
+                    $columna->setLink('https://www.youtube.com/watch?v='.$snippet['resourceId']['videoId']);
+                    
+                    array_unshift($columnas, $columna);
+                    $this->logger->info($columna->getTitulo());
+                }
+            }
+
+            $nextPageToken = $data['nextPageToken'] ?? null;
+
+        } while ($nextPageToken);
+    
+        return $columnas;
     }
 }

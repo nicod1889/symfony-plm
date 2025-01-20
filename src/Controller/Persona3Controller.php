@@ -2,25 +2,14 @@
 
 namespace App\Controller;
 
-use App\Entity\Persona3;
-use App\Form\Persona3Type;
 use App\Repository\Persona3Repository;
 use App\Repository\ProgramaRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/persona3')]
 class Persona3Controller extends AbstractController {
-    #[Route('/', name: 'app_persona3_index', methods: ['GET'])]
-    public function index(Persona3Repository $persona3Repository): Response {
-        return $this->render('persona3/index.html.twig', [
-            'persona3s' => $persona3Repository->findAll(),
-        ]);
-    }
-
     #[Route('/conductores', name: 'app_conductores_index', methods: ['GET'])] 
     public function conductores(Persona3Repository $persona3Repository, ProgramaRepository $programaRepository): Response   {
         $programas = $programaRepository->findAll();
@@ -59,6 +48,13 @@ class Persona3Controller extends AbstractController {
     #[Route('/columnistas', name: 'app_columnistas_index', methods: ['GET'])] 
     public function columnistas(Persona3Repository $persona3Repository): Response   {
         return $this->render('persona3/columnistas.html.twig', [
+            'columnistas' => $persona3Repository->findColumnistas(),
+        ]);
+    }
+
+    #[Route('/columnas/{id}', name: 'app_columnas_index', methods: ['GET'])] 
+    public function columnas(Persona3Repository $persona3Repository): Response   {
+        return $this->render('persona3/columnas.html.twig', [
             'columnistas' => $persona3Repository->findColumnistas(),
         ]);
     }

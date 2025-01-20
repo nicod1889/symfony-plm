@@ -17,11 +17,16 @@ use Symfony\Component\Routing\Attribute\Route;
 class ProgramaController extends AbstractController {
     #[Route('/', name: 'app_programa_index', defaults: ['page' => 1], methods: ['GET'])]
     #[Route('/page/{page<[0-9]\d*>}', name: 'programa_index_paginated', methods: ['GET'])]
-    public function index(ProgramaRepository $programaRepository, EdicionRepository $edicionRepository, int $page, Request $request): Response {
+    public function index(ProgramaRepository $programaRepository, EdicionRepository $edicionRepository, Persona3Repository $persona3Repository, int $page, Request $request): Response {
         $search = $request->query->get('search', '');
         $edicionId = $request->query->get('edicionId');
         $startDate = $request->query->get('startDate');
         $endDate = $request->query->get('endDate');
+        $columnistaId = $request->query->get('columnistaId');
+        $conductorId = $request->query->get('conductorId');
+
+        $columnistaId = $columnistaId ? (int)$columnistaId : null;
+        $conductorId = $conductorId ? (int)$conductorId : null;
 
         $startDate = $startDate ? \DateTime::createFromFormat('Y-m-d', $startDate) : null;
         $endDate = $endDate ? \DateTime::createFromFormat('Y-m-d', $endDate) : null;
@@ -29,7 +34,10 @@ class ProgramaController extends AbstractController {
         $ediciones = $edicionRepository->findByTipo('programa');
         $edicion = $edicionId ? $edicionRepository->find($edicionId) : null;
 
-        $programas = $programaRepository->findLatest($page, $search, $edicion, $startDate, $endDate);
+        $columnistas = $persona3Repository->findBy(['id' => range(5, 9)]);
+        $conductores = $persona3Repository->findBy(['id' => range(1, 5)]);
+
+        $programas = $programaRepository->findLatest($page, $search, $edicion, $startDate, $endDate, $columnistaId, $conductorId);
 
         return $this->render('programa/index.html.twig', [
             'paginator' => $programas,
@@ -37,7 +45,11 @@ class ProgramaController extends AbstractController {
             'search' => $search,
             'selectedEdicionId' => $edicionId,
             'startDate' => $startDate ? $startDate->format('Y-m-d') : '',
-            'endDate' => $endDate ? $endDate->format('Y-m-d') : ''
+            'endDate' => $endDate ? $endDate->format('Y-m-d') : '',
+            'columnistas' => $columnistas,
+            'selectedColumnistaId' => $columnistaId,
+            'conductores' => $conductores,
+            'selectedConductorId' => $conductorId
         ]);
     }
 

@@ -2,21 +2,17 @@
 
 namespace App\DataFixtures;
 
-use App\Entity\Comment;
 use App\Entity\Edicion;
-use App\Entity\Post;
 use App\Entity\Programa;
 use App\Entity\Vlog;
-use App\Entity\Tag;
 use App\Entity\User;
 use App\Entity\Persona3;
-use App\Entity\Rol;
 use Psr\Log\LoggerInterface;
 use App\Service\YoutubeService;
+use App\Repository\ProgramaRepository;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\String\AbstractUnicodeString;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use function Symfony\Component\String\u;
 
@@ -31,14 +27,73 @@ final class AppFixtures extends Fixture {
 
     public function load(ObjectManager $manager): void {
         $this->loadUsers($manager);
-        $this->loadTags($manager);
-        $this->loadPosts($manager);
         $this->loadEdiciones($manager);
         $this->loadProgramas($manager);
         $this->loadProgramasManual($manager);
         $this->loadPersona3($manager);
         $this->loadVlogs($manager);
         $this->vincularConductoresYColumnistas($manager);
+    }
+
+    private function loadColumnas(ObjectManager $manager): void {
+        foreach ($this->getColumnaData() as [$titulo, $link, $edicion]) {
+            $columna = new columna();
+            $columna->setTitulo($titulo);
+            $columna->setLink($link);
+            $manager->persist($columna);
+            $this->addReference($link, $columna);
+        }
+        $manager->flush();
+
+        try {
+            $playlistId = 'PLZFDO5xhcskdJd1bjxqBuukB-c9vdthTP';
+            $columnas = $this->youtubeService->getColumnasFromPlaylist($playlistId);
+
+            foreach ($columnas as $columnaData) {
+                $columna = new Columna();
+                $columna->setTitulo($columnaData->getTitulo());
+                $columna->setLink($columnaData->getLink());
+                $manager->persist($columna);
+            }
+
+            $manager->flush();
+        } catch (\Exception $e) {
+            $this->logger->error('Error al cargar las columnas: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * @return array<array{string, string, string, string}>
+     */
+    private function getColumnaData(): array {
+        return [
+            // $getColumnaData = [$titulo, $link, $edicion];
+            ['Politica #1', 'https://youtu.be/4Mxeine9d-k?si=ABGimtJNSJDOWrw3&t=3638', 'Política'],
+            ['Politica #2', 'https://youtu.be/IjDvoIgCUyU?si=cuq7tAsovnk9ufPu&t=1213', 'Política'],
+            ['Politica #3', 'https://youtu.be/JxRrOmZY5ZI?si=vJvEa9-HlyW8UY-D&t=3447', 'Política'],
+            ['Politica #4', 'https://youtu.be/GaYf3DR-xA8?si=hErjwXweTRugp637&t=3051', 'Política'],
+            ['Politica #5', 'https://youtu.be/dP9e3OE6vTo?si=sZKpXH600X-mfOPZ&t=3537', 'Política'],
+            ['Politica #6', 'https://youtu.be/LIRF6DT1VxY?si=tjVy1LkXpltQqI78&t=2890', 'Política'],
+            ['Politica #7', 'https://youtu.be/qEq37mSLGF4?si=I0ssQxBtN9sb9RnQ&t=3173', 'Política'],
+            ['Politica #8', 'https://youtu.be/4dTxcm4wSS0?si=FJp5QoNsh2_-Cky4&t=1884', 'Política'],
+            ['Politica #9', 'https://youtu.be/J75i6WfHNW4?si=m8Lw26LhpPS7ZeeQ&t=3151', 'Política'],
+            ['Politica #10', 'https://youtu.be/5JS4lJxtLyo?si=CTTsA4IMjg6woFlT&t=3077', 'Política'],
+            ['Politica #11', 'https://youtu.be/NbbpWI4g04o?si=InhkoZiGHvuyE3Ma&t=2986', 'Política'],
+            ['Politica #12', 'https://youtu.be/6dyv3lgSoUw?si=72QIBqmZ3DEexaTO&t=3123', 'Política'],
+            ['Politica #13', 'https://youtu.be/bOP4b2-fFt8?si=PD5sbQrTkR7WHDSf&t=3369', 'Política'],
+            ['Politica #14', 'https://youtu.be/MCQz8Dbn4QM?si=qwvpB8QxPBfBip-p&t=3048', 'Política'],
+            ['Politica #15', 'https://youtu.be/e7JR49aoQ1Q?si=ksA5i140fQKJhmf3&t=3192', 'Política'],
+            ['Politica #16', 'https://youtu.be/7mpFf5f17J4?si=n2-QIFNGg--jGbAz&t=3494', 'Política'],
+            ['Politica #17', 'https://youtu.be/rff-C0V1MFM?si=85TfnryyU8wF00nT&t=2135', 'Política'],
+            ['Politica #18', 'https://youtu.be/QgUv-MxmPeQ?si=QKtcKogEb1Z0lEL4&t=1720', 'Política'],
+            ['Politica #19', 'https://youtu.be/aQpaouzLrxA?si=GJMYMRXLEDIU1xDj&t=2659', 'Política'],
+            ['Politica #20', 'https://youtu.be/uFgvgjq05ME?si=FY4QwMgD7b9uuxYl&t=2040', 'Política'],
+            ['Politica #21', 'https://youtu.be/wIQ2CgT8bLk?si=LY_JMy2AM8mLjbTf&t=1930', 'Política'],
+            ['Politica #22', 'https://youtu.be/y58oqY-MVS0?si=3hzjcBHdZLu9Ns2Z&t=1865', 'Política'],
+            ['Politica #23', 'https://youtu.be/tk3yT4T4Isk?si=CjH1tqd3IGNU8FyX&t=2167', 'Política'],
+            ['Politica #24', 'https://youtu.be/9weTu566fM8?si=6TTN6NOQnvYApCb6&t=2027', 'Política'],
+            ['Politica #25', 'https://youtu.be/IO8SiDteyqk?si=QoOBDNf_wOJOFLZV&t=1949', 'Política']
+        ];
     }
 
     private function loadProgramas(ObjectManager $manager): void {
@@ -51,8 +106,7 @@ final class AppFixtures extends Fixture {
                 $programa->setTitulo($programaData->getTitulo());
                 $programa->setFecha($programaData->getFecha());
                 $programa->setLinkYoutube($programaData->getLinkYoutube());
-                $programa->setMiniaturaPequeña($programaData->getMiniaturaPequeña());
-                $programa->setMiniaturaGrande($programaData->getMiniaturaGrande());
+                $programa->setMiniatura($programaData->getMiniatura());
                 $manager->persist($programa);
             }
     
@@ -64,70 +118,75 @@ final class AppFixtures extends Fixture {
     }
 
     private function loadProgramasManual(ObjectManager $manager): void {
+        $bstrap1 = new Programa();
+        $bstrap1->setTitulo('BUENOS AIRES TRAP EN VIVO - DÍA 1 | Vorterix');
+        $bstrap1->setFecha(\DateTime::createFromFormat('d-m-Y', '07-12-2024'));
+        $bstrap1->setLinkYoutube('https://www.youtube.com/live/SeACw2s3o34?si=zD3GSmAWbdOesoau&t=10707');
+        $bstrap1->setMiniatura('https://i.ytimg.com/vi/SeACw2s3o34/maxresdefault.jpg');
+        $manager->persist($bstrap1);
+
+        $bstrap2 = new Programa();
+        $bstrap2->setTitulo('BUENOS AIRES TRAP EN VIVO - DÍA 2 | Vorterix');
+        $bstrap2->setFecha(\DateTime::createFromFormat('d-m-Y', '08-12-2024'));
+        $bstrap2->setLinkYoutube('https://www.youtube.com/live/sF63quen4S0?si=NoO102Wd9umcXXyP&t=15323');
+        $bstrap2->setMiniatura('https://i.ytimg.com/vi/sF63quen4S0/maxresdefault.jpg');
+        $manager->persist($bstrap2);
+
         $programa010322 = new Programa();
         $programa010322->setTitulo('#ParenLaMano completo - 01/03');
         $programa010322->setFecha(\DateTime::createFromFormat('d-m-Y', '01-03-2022'));
         $manager->persist($programa010322);
-        $manager->flush();
 
         $programa020322 = new Programa();
         $programa020322->setTitulo('#ParenLaMano completo - 02/03');
         $programa020322->setFecha(\DateTime::createFromFormat('d-m-Y', '01-03-2022'));
         $manager->persist($programa020322);
-        $manager->flush();
 
         $programa030322 = new Programa();
         $programa030322->setTitulo('#ParenLaMano completo - 03/03');
         $programa030322->setFecha(\DateTime::createFromFormat('d-m-Y', '01-03-2022'));
         $manager->persist($programa030322);
-        $manager->flush();
 
         $programa040322 = new Programa();
         $programa040322->setTitulo('#ParenLaMano completo - 04/03');
         $programa040322->setFecha(\DateTime::createFromFormat('d-m-Y', '01-03-2022'));
         $manager->persist($programa040322);
-        $manager->flush();
 
         $programa070322 = new Programa();
         $programa070322->setTitulo('#ParenLaMano completo - 07/03');
         $programa070322->setFecha(\DateTime::createFromFormat('d-m-Y', '01-03-2022'));
         $manager->persist($programa070322);
-        $manager->flush();
 
         $programa180322 = new Programa();
         $programa180322->setTitulo('#ParenLaMano Completo - 18/03 | Vorterix');
         $programa180322->setFecha(\DateTime::createFromFormat('d-m-Y', '01-03-2022'));
         $manager->persist($programa180322);
-        $manager->flush();
 
         $programa040422 = new Programa();
         $programa040422->setTitulo('#ParenLaMano Completo - 04/04 | Vorterix');
         $programa040422->setFecha(\DateTime::createFromFormat('d-m-Y', '04-04-2022'));
         $manager->persist($programa040422);
-        $manager->flush();
 
         $programa180522 = new Programa();
         $programa180522->setTitulo('#ParenLaMano Completo - 18/05 | Vorterix');
         $programa180522->setFecha(\DateTime::createFromFormat('d-m-Y', '18-05-2022'));
         $manager->persist($programa180522);
-        $manager->flush();
 
         $programa251022 = new Programa();
         $programa251022->setTitulo('#ParenLaMano Completo - 25/10 | Vorterix');
         $programa251022->setFecha(\DateTime::createFromFormat('d-m-Y', '25-10-2022'));
         $manager->persist($programa251022);
-        $manager->flush();
 
         $programa111122 = new Programa();
         $programa111122->setTitulo('#ParenLaMano Completo - 11/11 | Vorterix');
         $programa111122->setFecha(\DateTime::createFromFormat('d-m-Y', '11-11-2022'));
         $manager->persist($programa111122);
-        $manager->flush();
 
         $programa181122 = new Programa();
         $programa181122->setTitulo('#ParenLaMano Completo - 18/11 | Vorterix');
         $programa181122->setFecha(\DateTime::createFromFormat('d-m-Y', '18-11-2022'));
         $manager->persist($programa181122);
+
         $manager->flush();
     }
 
@@ -163,8 +222,7 @@ final class AppFixtures extends Fixture {
                 foreach ($vlogs as $vlogData) {
                     $vlog = new Vlog();
                     $vlog->setTitulo($vlogData->getTitulo());
-                    $vlog->setMiniaturaPequeña($vlogData->getMiniaturaPequeña());
-                    $vlog->setMiniaturaGrande($vlogData->getMiniaturaGrande());
+                    $vlog->setMiniatura($vlogData->getMiniatura());
                     $edicion = $edicionRepository->findByNombre($nombreEdicion);
     
                     if ($edicion) {
@@ -195,7 +253,7 @@ final class AppFixtures extends Fixture {
             foreach ($programasData as $programaData) {
                 $programa = $manager->getRepository(Programa::class)->findOneBy(['linkYoutube' => $programaData['youtube']]);
                 if (!$programa) {
-                    $this->logger->error('No se encontró el programa con el título: ' . $programaData['youtube'] . 'y fecha ' . $programaData['fecha']);
+                    $this->logger->error('No se encontró el programa con el título: ' . $programaData['youtube'] . ' y fecha ' . $programaData['fecha']);
                     continue;
                 }
 
@@ -288,46 +346,6 @@ final class AppFixtures extends Fixture {
             $manager->persist($edicion);
             $this->addReference($nombre, $edicion);
         }
-        $manager->flush();
-    }
-
-    private function loadTags(ObjectManager $manager): void {
-        foreach ($this->getTagData() as $name) {
-            $tag = new Tag($name);
-
-            $manager->persist($tag);
-            $this->addReference('tag-'.$name, $tag);
-        }
-
-        $manager->flush();
-    }
-
-    private function loadPosts(ObjectManager $manager): void {
-        foreach ($this->getPostData() as [$title, $slug, $summary, $content, $publishedAt, $author, $tags]) {
-            $post = new Post();
-            $post->setTitle($title);
-            $post->setSlug($slug);
-            $post->setSummary($summary);
-            $post->setContent($content);
-            $post->setPublishedAt($publishedAt);
-            $post->setAuthor($author);
-            $post->addTag(...$tags);
-
-            foreach (range(1, 5) as $i) {
-                /** @var User $commentAuthor */
-                $commentAuthor = $this->getReference('john_user');
-
-                $comment = new Comment();
-                $comment->setAuthor($commentAuthor);
-                $comment->setContent($this->getRandomText(random_int(255, 512)));
-                $comment->setPublishedAt(new \DateTimeImmutable('now + '.$i.'seconds'));
-
-                $post->addComment($comment);
-            }
-
-            $manager->persist($post);
-        }
-
         $manager->flush();
     }
 
@@ -644,162 +662,13 @@ final class AppFixtures extends Fixture {
             ['Estudio 2024', 'programa'],
             ['Copa América - Estados Unidos 2024', 'programa'],
             ['España 2024', 'programa'],
-            ['Personajes del año 2024', 'programa']
+            ['Buenos Aires Trap 2024', 'programa'],
+            ['Personajes del año 2024', 'programa'],
+            ['Política', 'columna'],
+            ['Fútbol', 'columna'],
+            ['Noski Game', 'columna'],
+            ['Mundo Brasil', 'columna'],
+            ['Música', 'columna'],
         ];
-    }
-
-    /**
-     * @return string[]
-     */
-    private function getTagData(): array {
-        return [
-            'lorem',
-            'ipsum',
-            'consectetur',
-            'adipiscing',
-            'incididunt',
-            'labore',
-            'voluptate',
-            'dolore',
-            'pariatur',
-            'TAG NUEVO',
-            'ACA HAY OTRO TAG CHE'
-        ];
-    }
-
-    /**
-     * @throws \Exception
-     *
-     * @return array<int, array{0: string, 1: AbstractUnicodeString, 2: string, 3: string, 4: \DateTimeImmutable, 5: User, 6: array<Tag>}>
-     */
-    private function getPostData(): array {
-        $posts = [];
-
-        foreach ($this->getPhrases() as $i => $title) {
-            // $postData = [$title, $slug, $summary, $content, $publishedAt, $author, $tags, $comments];
-
-            /** @var User $user */
-            $user = $this->getReference(['jane_admin', 'tom_admin'][0 === $i ? 0 : random_int(0, 1)]);
-
-            $posts[] = [
-                $title,
-                $this->slugger->slug($title)->lower(),
-                $this->getRandomText(),
-                $this->getPostContent(),
-                (new \DateTimeImmutable('now - '.$i.'days'))->setTime(random_int(8, 17), random_int(7, 49), random_int(0, 59)),
-                // Ensure that the first post is written by Jane Doe to simplify tests
-                $user,
-                $this->getRandomTags(),
-            ];
-        }
-
-        return $posts;
-    }
-
-    /**
-     * @return string[]
-     */
-    private function getPhrases(): array {
-        return [
-            'Lorem ipsum dolor sit amet consectetur adipiscing elit',
-            'Pellentesque vitae velit ex',
-            'Mauris dapibus risus quis suscipit vulputate',
-            'Eros diam egestas libero eu vulputate risus',
-            'In hac habitasse platea dictumst',
-            'Morbi tempus commodo mattis',
-            'Ut suscipit posuere justo at vulputate',
-            'Ut eleifend mauris et risus ultrices egestas',
-            'Aliquam sodales odio id eleifend tristique',
-            'Urna nisl sollicitudin id varius orci quam id turpis',
-            'Nulla porta lobortis ligula vel egestas',
-            'Curabitur aliquam euismod dolor non ornare',
-            'Sed varius a risus eget aliquam',
-            'Nunc viverra elit ac laoreet suscipit',
-            'Pellentesque et sapien pulvinar consectetur',
-            'Ubi est barbatus nix',
-            'Abnobas sunt hilotaes de placidus vita',
-            'Ubi est audax amicitia',
-            'Eposs sunt solems de superbus fortis',
-            'Vae humani generis',
-            'Diatrias tolerare tanquam noster caesium',
-            'Teres talis saepe tractare de camerarius flavum sensorem',
-            'Silva de secundus galatae demitto quadra',
-            'Sunt accentores vitare salvus flavum parses',
-            'Potus sensim ad ferox abnoba',
-            'Sunt seculaes transferre talis camerarius fluctuies',
-            'Era brevis ratione est',
-            'Sunt torquises imitari velox mirabilis medicinaes',
-            'Mineralis persuadere omnes finises desiderium',
-            'Bassus fatalis classiss virtualiter transferre de flavum',
-        ];
-    }
-
-    private function getRandomText(int $maxLength = 255): string {
-        $phrases = $this->getPhrases();
-        shuffle($phrases);
-
-        do {
-            $text = u('. ')->join($phrases)->append('.');
-            array_pop($phrases);
-        } while ($text->length() > $maxLength);
-
-        return $text;
-    }
-
-    private function getPostContent(): string {
-        return <<<'MARKDOWN'
-            Lorem ipsum dolor sit amet consectetur adipisicing elit, sed do eiusmod tempor
-            incididunt ut labore et **dolore magna aliqua**: Duis aute irure dolor in
-            reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-            Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia
-            deserunt mollit anim id est laborum.
-
-              * Ut enim ad minim veniam
-              * Quis nostrud exercitation *ullamco laboris*
-              * Nisi ut aliquip ex ea commodo consequat
-
-            Praesent id fermentum lorem. Ut est lorem, fringilla at accumsan nec, euismod at
-            nunc. Aenean mattis sollicitudin mattis. Nullam pulvinar vestibulum bibendum.
-            Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos
-            himenaeos. Fusce nulla purus, gravida ac interdum ut, blandit eget ex. Duis a
-            luctus dolor.
-
-            Integer auctor massa maximus nulla scelerisque accumsan. *Aliquam ac malesuada*
-            ex. Pellentesque tortor magna, vulputate eu vulputate ut, venenatis ac lectus.
-            Praesent ut lacinia sem. Mauris a lectus eget felis mollis feugiat. Quisque
-            efficitur, mi ut semper pulvinar, urna urna blandit massa, eget tincidunt augue
-            nulla vitae est.
-
-            Ut posuere aliquet tincidunt. Aliquam erat volutpat. **Class aptent taciti**
-            sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Morbi
-            arcu orci, gravida eget aliquam eu, suscipit et ante. Morbi vulputate metus vel
-            ipsum finibus, ut dapibus massa feugiat. Vestibulum vel lobortis libero. Sed
-            tincidunt tellus et viverra scelerisque. Pellentesque tincidunt cursus felis.
-            Sed in egestas erat.
-
-            Aliquam pulvinar interdum massa, vel ullamcorper ante consectetur eu. Vestibulum
-            lacinia ac enim vel placerat. Integer pulvinar magna nec dui malesuada, nec
-            congue nisl dictum. Donec mollis nisl tortor, at congue erat consequat a. Nam
-            tempus elit porta, blandit elit vel, viverra lorem. Sed sit amet tellus
-            tincidunt, faucibus nisl in, aliquet libero.
-            MARKDOWN;
-    }
-
-    /**
-     * @throws \Exception
-     *
-     * @return array<Tag>
-     */
-    private function getRandomTags(): array {
-        $tagNames = $this->getTagData();
-        shuffle($tagNames);
-        $selectedTags = \array_slice($tagNames, 0, random_int(2, 4));
-
-        return array_map(function ($tagName) {
-            /** @var Tag $tag */
-            $tag = $this->getReference('tag-'.$tagName);
-
-            return $tag;
-        }, $selectedTags);
     }
 }

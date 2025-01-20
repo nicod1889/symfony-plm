@@ -23,7 +23,7 @@
     
         <h1 class="fw-bold mt-5 text-center">Mirá todos los programas!</h1>
         <a href="{{ path('app_programa_index') }}" class="aa w-75 p-0 mx-auto ratio ratio-16x9"> 
-            <img src="{{ programa.miniaturaGrande }}" alt="Imagen PLM" class="img-fluid object-fit-cover">
+            <img src="{{ programa.miniatura }}" alt="Imagen PLM" class="img-fluid object-fit-cover">
         </a>
 
         <h1 class="fw-bold mt-5 text-center">Salen esos vlogs de la bandurria?</h1>
@@ -32,7 +32,7 @@
                 {% for edicion in ediciones %}
                     <div class="carousel-item {% if loop.first %}active{% endif %}">
                         {% set firstVlog = edicion.vlogs|first %}
-                        <img src="{{ firstVlog.miniaturaGrande }}" class="d-block w-100 rounded-top img-fluid" alt="Imagen de la edición {{ edicion.nombre }}" style="max-height: 400px; object-fit: cover;">
+                        <img src="{{ firstVlog.miniatura }}" class="d-block w-100 rounded-top img-fluid" alt="Imagen de la edición {{ edicion.nombre }}" style="max-height: 400px; object-fit: cover;">
                         <div class="d-flex justify-content-center mb-0">
                             <div class="text-white p-2 w-100 text-center rounded-bottom" style="background-color: black;">
                                 <h5>{{ edicion.nombre }}</h5>

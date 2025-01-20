@@ -2,23 +2,23 @@
 
 namespace App\Entity;
 
-use App\Repository\VlogRepository;
+use App\Repository\ColumnaRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: VlogRepository::class)]
-class Vlog {
+#[ORM\Entity(repositoryClass: ColumnaRepository::class)]
+class Columna {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 50)]
     private ?string $titulo = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $miniatura = null;
+    #[ORM\Column(length: 255)]
+    private ?string $link = null;
 
-    #[ORM\ManyToOne(inversedBy: 'vlogs')]
+    #[ORM\ManyToOne(inversedBy: 'columnas')]
     private ?Edicion $edicion = null;
 
     public function getId(): ?int {
@@ -34,12 +34,12 @@ class Vlog {
         return $this;
     }
 
-    public function getMiniatura(): ?string {
-        return $this->miniatura;
+    public function getLink(): ?string {
+        return $this->link;
     }
 
-    public function setMiniatura(string $miniatura): static {
-        $this->miniatura = $miniatura;
+    public function setLink(string $link): static {
+        $this->link = $link;
         return $this;
     }
 

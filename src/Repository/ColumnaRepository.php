@@ -11,22 +11,22 @@
 
 namespace App\Repository;
 
-use App\Entity\Category;
+use App\Entity\Columna;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Category>
+ * @extends ServiceEntityRepository<Columna>
  */
-class CategoryRepository extends ServiceEntityRepository
+class ColumnaRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Category::class);
+        parent::__construct($registry, Columna::class);
     }
 
     //    /**
-    //     * @return Category[] Returns an array of Category objects
+    //     * @return Columna[] Returns an array of Columna objects
     //     */
     //    public function findByExampleField($value): array
     //    {
@@ -40,7 +40,7 @@ class CategoryRepository extends ServiceEntityRepository
     //        ;
     //    }
 
-    //    public function findOneBySomeField($value): ?Category
+    //    public function findOneBySomeField($value): ?Columna
     //    {
     //        return $this->createQueryBuilder('c')
     //            ->andWhere('c.exampleField = :val')

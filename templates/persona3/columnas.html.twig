@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}PLM DB{% endblock %}
+
+{% block body %}
+<div class="py-5 px-5 mt-0 mx-auto" style="background-color: #312c42; width: 95%;" >
+    <h1 class="fw-bold text-center">Las columnas de Joaco Cavanna</h1>
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for columna in columnistas %}
+        <div class="col mb-3 ">
+            <div class="card h-100" style="background-color:rgb(33, 30, 44);">
+                <img src="{{ columna.foto }}" class="card-img-top " alt="Miniatura del columna ">
+                <div class="card-body">
+                    <h5 class="card-title">{{ columna.nombre }}</h5>
+                </div>
+                <div class="card-footer text-center" style="padding-left: 15px;padding-right: 15px;">
+                    <a class="btn btn-primary py-1 px-2 mr-2" data-toggle="modal" data-target="#columna-modal-{{columna.id}}" target="_blank"> Más data </a>
+                    <a class="btn btn-danger py-1 px-2 mr-2" target="_blank" href="{{ columna.nacimiento|date('d/m/Y') }}"> Youtube </a>
+                    <a class="btn btn-success py-1 px-2" target="_blank" href="{{ columna.edad }}"> Spotify </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% endblock %}

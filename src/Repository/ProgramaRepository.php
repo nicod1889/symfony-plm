@@ -17,7 +17,7 @@ class ProgramaRepository extends ServiceEntityRepository {
         parent::__construct($registry, Programa::class);
     }
 
-    public function findLatest(int $page = 1, string $search = '', ?Edicion $edicion = null, ?\DateTimeInterface $startDate = null, ?\DateTimeInterface $endDate = null): Paginator {
+    public function findLatest(int $page = 1, string $search = '', ?Edicion $edicion = null, ?\DateTimeInterface $startDate = null, ?\DateTimeInterface $endDate = null, ?int $columnistaId = null, ?int $conductorId = null): Paginator {
         $qb = $this->createQueryBuilder('p')
         ->orderBy('p.fecha', 'ASC');
 
@@ -39,6 +39,18 @@ class ProgramaRepository extends ServiceEntityRepository {
         if ($endDate) {
             $qb->andWhere('p.fecha <= :endDate')
                 ->setParameter('endDate', $endDate->format('Y-m-d'));
+        }
+
+        if ($columnistaId) {
+            $qb->leftJoin('p.columnistas', 'c')
+                ->andWhere('c.id = :columnistaId')
+                ->setParameter('columnistaId', $columnistaId);
+        }
+
+        if ($conductorId) {
+            $qb->leftJoin('p.conductores', 'cond')
+                ->andWhere('cond.id = :conductorId')
+                ->setParameter('conductorId', $conductorId);
         }
 
         return (new Paginator($qb))->paginate($page);

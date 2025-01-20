@@ -5,7 +5,6 @@
         <meta name="viewport" content="width=device-width, initial-scale=1"/>
         <meta name="view-transition" content="same-origin" />
         <title>{% block title %}Symfony Demo application{% endblock %}</title>
-        <link rel="alternate" type="application/rss+xml" title="{{ 'rss.title'|trans }}" href="{{ path('blog_rss') }}">
 
         {% block stylesheets %}{% endblock %}
         {% block javascripts %}
@@ -36,12 +35,12 @@
                                         <a class="nav-link" href="{{ path('home_index') }}"> <i class="fa fa-home" aria-hidden="true"></i> Inicio </a>
                                     </li>
                                     <li class="nav-item dropdown">
-                                        <a class="nav-link dropdown-toggle{{ _route == 'app_persona3_index' ? ' active' : '' }}" href="{{ path('app_persona3_index') }}" data-bs-toggle="dropdown" aria-expanded="false"> Integrantes </a>
+                                        <a class="nav-link dropdown-toggle{{ _route == 'app_conductores_index' ? ' active' : '' }}" href="{{ path('app_conductores_index') }}" data-bs-toggle="dropdown" aria-expanded="false"> Integrantes </a>
                                         <ul class="dropdown-menu pb-0">
                                             <li><a class="dropdown-item" href="{{ path('app_conductores_index', {programYear: 2022, page: 1}) }}">Plantel fijo</a></li>
                                             <li><a class="dropdown-item" href="{{ path('app_columnistas_index', {programYear: 2023, page: 1}) }}">Columnistas</a></li>
                                             <li><hr class="dropdown-divider"></li>
-                                            <li><a class="dropdown-item" href="{{ path('app_persona3_index') }}">Todos los integrantes</a></li>
+                                            <li><a class="dropdown-item" href="{{ path('app_conductores_index') }}">Todos los integrantes</a></li>
                                         </ul>
                                     </li>
                                     <li class="nav-item dropdown">
@@ -62,9 +61,6 @@
                                     </li>
                                     <li class="nav-item{{ _route == 'app_pdm_index' ? ' active' : '' }}">
                                         <a class="nav-link" href="{{ path('app_pdm_index') }}"> Párense de Manos </a>
-                                    </li>
-                                    <li class="nav-item{{ _route == 'blog_search' ? ' active' : '' }}">
-                                        <a class="nav-link" href="{{ path('blog_search') }}"> <i class="fa fa-search"></i> {{ 'menu.search'|trans }}</a>
                                     </li>
                                 {% endblock %}
 
